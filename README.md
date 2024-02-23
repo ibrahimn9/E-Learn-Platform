@@ -9,7 +9,7 @@ E-Learn Platform is a web-based application designed to facilitate distance lear
 - Administrators can enroll students in courses, create cohorts, and manage user roles and permissions.
 
 ## Technologies Used:
-- Frontend: Vue.js, HTML5, CSS3, JavaScript
+- Frontend: React.js, HTML5, CSS3, JavaScript
 - Backend: Node.js, Express
 - Version Control: Git, GitHub
 - Project Management: Trello
