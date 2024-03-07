@@ -1,3 +1,5 @@
 node_modules
 init.sql
 man.sql
+.env
+.vscode
