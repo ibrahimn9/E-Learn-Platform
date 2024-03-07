@@ -20,9 +20,8 @@ app.use("/", (req, res, next) => {
 
 const server = app.listen(PORT, async () => {
 	try {
-		const object = await pool.execute("SELECT * FROM admins");
-
-		console.log(object);
+		const connection = await pool.execute("SELECT 1");
+		console.log(`Connected To Database `);
 		console.log(`Server is Listening on PORT ${PORT}`);
 	} catch (error) {
 		console.log(error);
