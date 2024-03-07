@@ -1,20 +1,17 @@
 import db from "../config/database.js";
 
 export default class Student {
-  // constructor
-  constructor(id, fullName, email, password, isVerified, idCohorte, idAdmin) {
-		this.id = id;
+	// constructor
+	constructor(fullName, email, password, color) {
 		this.fullName = fullName;
 		this.email = email;
 		this.password = password;
-		this.isVerified = isVerified;
-		this.idCohorte = idCohorte;
-		this.idAdmin = idAdmin;
+		this.color = color;
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO students (fullName , email , password ) VALUES (?,?,?) `,
-			[this.fullName, this.email, this.password]
+			`INSERT INTO admins (fullName , email , password ,color) VALUES (?,?,?,?) `,
+			[this.fullName, this.email, this.password, this.color]
 		);
 	}
 	static fetchAll() {
