@@ -1,4 +1,4 @@
-import ApiError from '../utils/ApiError.js'
+
 
 const sendErrorForDev = (err, res) =>
 	res.status(400).json({
@@ -14,7 +14,7 @@ const sendErrorForPro = (err, res) =>
 		message: err.message,
 	});
 
-export const globalError = (err, req, res, next) => {
+const globalError = (err, req, res, next) => {
 	err.statusCode = err.statusCode || 500;
 	err.status = err.status || "Error";
 	if (process.env.NODE_ENV === "development") {
@@ -24,3 +24,4 @@ export const globalError = (err, req, res, next) => {
 	}
 };
 
+module.exports = globalError;

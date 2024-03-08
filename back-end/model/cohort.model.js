@@ -1,6 +1,5 @@
-import db from "../config/database.js";
-
-export default class Cohort {
+const db = require("../config/database");
+class Cohort {
 	// constructor
 	constructor(groupeNumber, totalMember, idClass, adminCreator) {
 		this.groupeNumber = groupeNumber;
@@ -18,3 +17,5 @@ export default class Cohort {
 		return db.execute("SELECT * FROM cohorts");
 	}
 }
+
+module.exports = Cohort

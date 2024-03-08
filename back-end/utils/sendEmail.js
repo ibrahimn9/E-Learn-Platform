@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer'
+const nodemailer = require("nodemailer")
 
-export default sendEmail = async (options) => {
+const sendEmail = async (options) => {
 	// 1) create a transporter (the service that will send email like : "Gmail","mailGun","mailTrap","Send Grid")
 
 	const transporter = nodemailer.createTransport({
@@ -17,7 +17,7 @@ export default sendEmail = async (options) => {
 	});
 	// 2) Define email Options (like : from, to, subject,email content)
 	const emailOptions = {
-		from: `E-COMMERCE APP < ${process.env.EMAIL_USER} >`,
+		from: `E-LEARN APP < ${process.env.EMAIL_USER} >`,
 		to: options.email,
 		subject: options.subject,
 		html: options.message,
@@ -25,3 +25,5 @@ export default sendEmail = async (options) => {
 	// 3) send email
 	await transporter.sendMail(emailOptions);
 };
+
+module.exports = sendEmail;

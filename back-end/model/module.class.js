@@ -1,21 +1,26 @@
-import db from "../config/database.js";
-
-export default class Module {
+const db = require("../config/database");
+class Module {
 	// constructor
-	constructor(name, semester, description, Specialty, idAdmin) {
+	constructor(name, semester, description, idEditor) {
 		this.name = name;
 		this.semester = semester;
 		this.description = description;
-		this.Specialty = Specialty;
-		this.idAdmin = idAdmin;
+		this.idEditor = idEditor;
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO modules (name, semester, description, Specialty, idAdmin) VALUES (?,?,?,?) `,
-			[this.name, this.semester, this.description, this.Specialty, this.idAdmin]
+			`INSERT INTO modules (name, semester, description, idEditor) VALUES (?,?,?,?) `,
+			[
+				this.name,
+				this.semester,
+				this.description,
+				this.idEditor,
+			]
 		);
 	}
 	static fetchAll() {
 		return db.execute("SELECT * FROM modules");
 	}
 }
+
+module.exports = Module;
