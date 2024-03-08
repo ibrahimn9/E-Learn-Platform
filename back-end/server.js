@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import pool from "./config/database.js";
 import routerAuth from "./route/authRoute.js";
+import ApiError from "./utils/ApiError.js";
 const PORT = process.env.PORT;
 
 const app = express();

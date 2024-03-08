@@ -2,7 +2,7 @@ import db from "../config/database.js";
 
 export default class Admin {
 	// constructor
-	constructor(fullName, email, password, color) {
+	constructor(fullName, email, password, color ) {
 		this.fullName = fullName;
 		this.email = email;
 		this.password = password;
