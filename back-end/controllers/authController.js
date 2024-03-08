@@ -8,8 +8,9 @@ const Teacher = require("../model/teacher.model.js");
 const Admin = require("../model/admin.model.js");
 const VerificationToken = require("../model/verificationToken.model.js");
 const ApiError = require("../utils/ApiError.js");
-const createToken  = require("../utils/createToken.js");
-const sendEmail  = require("../utils/sendEmail.js");
+const createToken = require("../utils/createToken.js");
+const sendEmail = require("../utils/sendEmail.js");
+const axios = require("axios");
 
 function capitalizeUserName(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -120,15 +121,16 @@ const signInController = asyncHandler(async (req, res, next) => {
  * @method  GET
  * @access  public
  ------------------------------------------------*/
-const verifyUserAccountCtrl = asyncHandler(async (req, res) => {
+const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	const verificationToken = await VerificationToken.findOne(
 		req.params.userId,
 		req.params.token
 	);
 	const [[rows], fields] = verificationToken;
-
-	if (!rows) {
-		return next(new ApiError("Invalid Link"), 401);
+	const DateCreated = new Date(rows.created_at);
+	const DateExpiration = Date.now() - (DateCreated.getTime() + 20 * 60 * 1000 );
+	if (!rows || DateExpiration > 0) {
+		return next(new ApiError("Invalid Link Or Have Been Expired"), 401);
 	}
 	let user;
 	const role = rows.role;
@@ -149,10 +151,28 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res) => {
 	if (!user) {
 		return next(new ApiError("Invalid Link"), 401);
 	}
-
+	const [[userData]] = user;
 	await VerificationToken.deleteById(rows.id);
-
-	res.status(200).json({ message: "Your account verified" });
+	userData.isVerified = true;
+	const { email, password } = userData;
+	console.log(email, password);
+	// Making an HTTP GET request to another route '/route2'
+	const response = await axios.post(
+		`${process.env.CLIENT_DOMAIN}/api/v1/auth/signIn`,
+		{ email, password }
+	);
+	// 3.generate token
+	const token = createToken(
+		[userData.id, userData.email],
+		process.env.JWT_SECRET_KEY
+	);
+	res
+		.cookie("access_token", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+		})
+		.status(200)
+		.json({ message: "Your account verified", userData, role });
 });
 
-module.exports = {signInController , verifyUserAccountCtrl}
+module.exports = { signInController, verifyUserAccountCtrl };
