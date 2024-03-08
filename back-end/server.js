@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import pool from "./config/database.js";
 import routerAuth from "./route/authRoute.js";
+import ApiError from "./utils/ApiError.js";
 const PORT = process.env.PORT;
 
 const app = express();
@@ -14,9 +15,13 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use("/api/v1/auth", routerAuth);
 
-app.use("/", (req, res, next) => {
-	res.send("Hello World!");
+// For Unmounted Url 
+app.all("*", (req, res, next) => {
+	next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
 });
+
+// Global error handling middleware for express
+app.use(globalError);
 
 const server = app.listen(PORT, async () => {
 	try {
@@ -28,12 +33,6 @@ const server = app.listen(PORT, async () => {
 	}
 });
 
-app.all("*", (req, res, next) => {
-	next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
-});
-
-// Global error handling middleware for express
-app.use(globalError);
 
 // Event => list =>callback(err)
 // Handle rejection outside express
