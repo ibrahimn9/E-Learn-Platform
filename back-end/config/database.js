@@ -1,4 +1,4 @@
-import mysql from "mysql2";
+const mysql = require("mysql2")
 
 const pool = mysql
 	.createPool({
@@ -8,5 +8,6 @@ const pool = mysql
 		database: process.env.DB_NAME,
 	})
 	.promise();
+
+module.exports = pool;
 // for using the the power of promise with async/await or chaining the promise with .then().catch()
-export default pool;

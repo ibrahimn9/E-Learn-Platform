@@ -1,6 +1,5 @@
-import db from "../config/database.js";
-
-export default class Teaching {
+const db = require("../config/database.js");
+class Teaching {
 	// constructor
 	constructor(idTeacher, idModule) {
 		this.idTeacher = idTeacher;
@@ -16,3 +15,5 @@ export default class Teaching {
 		return db.execute("SELECT * FROM classes");
 	}
 }
+
+module.exports = Teaching;
