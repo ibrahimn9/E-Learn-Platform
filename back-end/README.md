@@ -46,3 +46,12 @@ To start the Express server, run the following command:
 ```bash
 npm run start
 ```
+
+
+## Issues and Feedback
+
+If you encounter any issues with the demo code or have any feedback, please [open an issue](https://github.com/ibrahimn9/E-Learn-Platform/issues) in this repository.
+
+## License
+
+This  code is provided under the [MIT License](LICENSE).
