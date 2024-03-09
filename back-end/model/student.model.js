@@ -43,6 +43,12 @@ class Student {
 			[email, password]
 		);
 	}
+	static findByEmail(email) {
+		return db.execute(
+			"SELECT * FROM `students` WHERE `email` = ? ",
+			[email]
+		);
+	}
 	static findById(id) {
 		return db.execute("SELECT * FROM students WHERE `id` = ?  ", [id]);
 	}
@@ -52,6 +58,14 @@ class Student {
               SET isVerified = ?
               WHERE id = ?`,
 			[isVerified, id]
+		);
+	}
+	static updatePassword(id,password) {
+		return db.execute(
+			`UPDATE students 
+              SET password = ?
+              WHERE id = ?`,
+			[password, id]
 		);
 	}
 }

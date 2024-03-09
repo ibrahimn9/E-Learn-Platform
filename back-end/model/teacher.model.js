@@ -33,6 +33,12 @@ class Teacher {
 			[email, password]
 		);
 	}
+	static findByEmail(email) {
+		return db.execute(
+			"SELECT * FROM `teachers` WHERE `email` = ? AND `password` = ?",
+			[email]
+		);
+	}
 	static findById(id) {
 		return db.execute("SELECT * FROM teachers WHERE `id` = ?  ", [id]);
 	}
@@ -42,6 +48,14 @@ class Teacher {
               SET isVerified = ?
               WHERE id = ?`,
 			[isVerified, id]
+		);
+	}
+	static updatePassword(password, id) {
+		return db.execute(
+			`UPDATE teachers 
+              SET password = ?
+              WHERE id = ?`,
+			[password, id]
 		);
 	}
 }

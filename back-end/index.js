@@ -20,6 +20,7 @@ if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 	console.log(`mode: ${process.env.NODE_ENV}`);
 }
+
 app.use("/api/v1/auth", routerAuth);
 
 // For Unmounted Url
