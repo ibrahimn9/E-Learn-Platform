@@ -32,6 +32,12 @@ class Admin {
 	static findByEmail(email) {
 		return db.execute("SELECT * FROM `admins` WHERE `email` = ?", [email]);
 	}
+	static findByEmail(email) {
+		return db.execute(
+			"SELECT * FROM `admins` WHERE `email` = ? ",
+			[email]
+		);
+	}
 	static findById(id) {
 		return db.execute("SELECT * FROM admins WHERE `id` = ?  ", [id]);
 	}
@@ -41,6 +47,14 @@ class Admin {
               SET isVerified = ?
               WHERE id = ?`,
 			[isVerified, id]
+		);
+	}
+    static updatePassword(password, id) {
+		return db.execute(
+			`UPDATE admins 
+              SET password = ?
+              WHERE id = ?`,
+			[password, id]
 		);
 	}
 }

@@ -60,7 +60,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 	//  2.Check if The user have signIn in our platform {isVerified}
 	if (userData.isVerified) {
 		// 3.generate token
-		const token = createToken(
+		const token = createToken( 
 			[userData.id, userData.email],
 			process.env.JWT_SECRET_KEY
 		);
@@ -126,11 +126,9 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 		req.params.token
 	);
 	const [[rows], fields] = verificationToken;
-	console.log(rows)
-	const DateCreated = new Date(rows.created_at);
-	const DateExpiration = Date.now() - (DateCreated.getTime() + 20 * 60 * 1000);
-	if (!rows || DateExpiration > 0) {
-		return next(new ApiError("Invalid Link Or Have Been Expired", 401));
+
+	if (!rows) {
+		return next(new ApiError("Invalid Link"), 401);
 	}
 	let user;
 	const role = rows.role;
@@ -169,4 +167,4 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 		.json({ message: "Your account verified", userData, role });
 });
 
-module.exports = { signInController, verifyUserAccountCtrl };
+module.exports = {signInController , verifyUserAccountCtrl}
