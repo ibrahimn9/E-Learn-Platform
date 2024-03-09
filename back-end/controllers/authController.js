@@ -19,7 +19,7 @@ function capitalizeUserName(string) {
 
 /**-----------------------------------------------
  * @desc    Sign In New User
- * @route   /api/auth/signIn
+ * @route   /api/v1/auth/signIn
  * @method  POST
  * @access  public
 ------------------------------------------------*/
@@ -50,11 +50,10 @@ const signInController = asyncHandler(async (req, res, next) => {
 			}
 		}
 	}
-	const result = await bcrypt.compare(req.body.password, userData.password);
 	// Compare The password With The hashed Password In Database
 	if (
 		!userData ||
-		!(await bcrypt.compare(req.body.password, userData.password))
+		!(await bcrypt.compare(password, userData.password))
 	) {
 		return next(new ApiError("Invalid email or password", 401));
 	}
@@ -117,7 +116,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 
 /**-----------------------------------------------
  * @desc    Verify User Account
- * @route   /api/auth/:userId/verify/:token
+ * @route   /api/v1/auth/:userId/verify/:token
  * @method  GET
  * @access  public
  ------------------------------------------------*/
