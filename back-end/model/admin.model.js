@@ -1,4 +1,6 @@
 const db = require("../config/database");
+const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcrypt")
 class Admin {
 	// constructor
 	constructor(fullName, email, password, color, isVerified) {
@@ -8,21 +10,27 @@ class Admin {
 		this.color = color;
 		this.isVerified = isVerified;
 	}
-	save() {
+	async save() {
+		// Hash the password before saving
+		this.password = await bcrypt.hash(this.password, 12);
 		return db.execute(
-			`INSERT INTO admins (fullName , email , password ,color , isVerified) VALUES (?,?,?,?,?) `,
-			[this.fullName, this.email, this.password, this.color, this.isVerified]
+			`INSERT INTO admins (id,fullName , email , password ,color , isVerified) VALUES (?,?,?,?,?) `,
+			[
+				uuidv4(),
+				this.fullName,
+				this.email,
+				this.password,
+				this.color,
+				this.isVerified,
+			]
 		);
 	}
 	static fetchAll() {
 		return db.execute("SELECT * FROM admins");
 	}
 
-	static findByEmailAndPassword(email, password) {
-		return db.execute(
-			"SELECT * FROM `admins` WHERE `email` = ? AND `password` = ?",
-			[email, password]
-		);
+	static findByEmail(email) {
+		return db.execute("SELECT * FROM `admins` WHERE `email` = ?", [email]);
 	}
 	static findById(id) {
 		return db.execute("SELECT * FROM admins WHERE `id` = ?  ", [id]);
@@ -36,6 +44,5 @@ class Admin {
 		);
 	}
 }
-
 
 module.exports = Admin;

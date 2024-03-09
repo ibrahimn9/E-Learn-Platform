@@ -3,3 +3,4 @@ init.sql
 man.sql
 .env
 .vscode
+test.js

@@ -1,4 +1,5 @@
 const db = require("../config/database.js");
+const { v4: uuidv4 } = require("uuid");
 class Teaching {
 	// constructor
 	constructor(idTeacher, idModule) {
@@ -7,8 +8,8 @@ class Teaching {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO classes (idTeacher, idModule) VALUES (?,?) `,
-			[this.idTeacher, this.idModule]
+			`INSERT INTO classes (id,idTeacher, idModule) VALUES (?,?,?) `,
+			[uuidv4(),this.idTeacher, this.idModule]
 		);
 	}
 	static fetchAll() {

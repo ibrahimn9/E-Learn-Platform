@@ -1,4 +1,5 @@
 const db = require("../config/database");
+const { v4: uuidv4 } = require("uuid");
 class Module {
 	// constructor
 	constructor(name, semester, description, idEditor) {
@@ -9,8 +10,9 @@ class Module {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO modules (name, semester, description, idEditor) VALUES (?,?,?,?) `,
+			`INSERT INTO modules (id,name, semester, description, idEditor) VALUES (?,?,?,?,?) `,
 			[
+				uuidv4(),
 				this.name,
 				this.semester,
 				this.description,

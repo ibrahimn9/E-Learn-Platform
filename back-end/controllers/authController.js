@@ -2,6 +2,7 @@ const path = require("path");
 const crypto = require("crypto");
 const express = require("express");
 const ejs = require("ejs");
+const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
 const Student = require("../model/student.model.js");
 const Teacher = require("../model/teacher.model.js");
@@ -21,42 +22,41 @@ function capitalizeUserName(string) {
  * @route   /api/auth/signIn
  * @method  POST
  * @access  public
- ------------------------------------------------*/
+------------------------------------------------*/
 
 const signInController = asyncHandler(async (req, res, next) => {
 	// 1.Check If user Exist (if it's (admin , teacher , student)  ) / Error if not Based On{Email / Password}
 	const { email, password } = req.body;
-	// Search for the user in a single table
+	// Search for the user in every single table (Student , Teacher , Admin)
 	let role;
 	let userData; // Variable to hold user data
 	// Search for student
-	const [[student]] = await Student.findByEmailAndPassword(email, password);
+	const [[student]] = await Student.findByEmail(email);
 	if (student) {
 		userData = student;
 		role = "student";
 	} else {
 		// Search for teacher
-		const [[teacher]] = await Teacher.findByEmailAndPassword(email, password);
+		const [[teacher]] = await Teacher.findByEmail(email);
 		if (teacher) {
 			userData = teacher;
 			role = "teacher";
 		} else {
 			// Search for admin
-			const [[admin]] = await Admin.findByEmailAndPassword(email, password);
+			const [[admin]] = await Admin.findByEmail(email);
 			if (admin) {
 				userData = admin;
 				role = "admin";
 			}
 		}
 	}
-	if (!role) {
-		// Handle case when user not found
-		return next(
-			new ApiError(
-				`There is no account with the provided email/password. Please try again.`,
-				401
-			)
-		);
+	const result = await bcrypt.compare(req.body.password, userData.password);
+	// Compare The password With The hashed Password In Database
+	if (
+		!userData ||
+		!(await bcrypt.compare(req.body.password, userData.password))
+	) {
+		return next(new ApiError("Invalid email or password", 401));
 	}
 	//  2.Check if The user have signIn in our platform {isVerified}
 	if (userData.isVerified) {
@@ -90,7 +90,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 				emailTemplate = result;
 				try {
 					await sendEmail({
-						email: capitalizeUserName(userData.email),
+						email: userData.email,
 						subject: "Verification Link to E-Learn Platform",
 						message: emailTemplate,
 					});
@@ -127,10 +127,11 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 		req.params.token
 	);
 	const [[rows], fields] = verificationToken;
+	console.log(rows)
 	const DateCreated = new Date(rows.created_at);
-	const DateExpiration = Date.now() - (DateCreated.getTime() + 20 * 60 * 1000 );
+	const DateExpiration = Date.now() - (DateCreated.getTime() + 20 * 60 * 1000);
 	if (!rows || DateExpiration > 0) {
-		return next(new ApiError("Invalid Link Or Have Been Expired"), 401);
+		return next(new ApiError("Invalid Link Or Have Been Expired", 401));
 	}
 	let user;
 	const role = rows.role;
@@ -149,18 +150,12 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 		await Admin.updateUserVerified(true, req.params.userId);
 	}
 	if (!user) {
-		return next(new ApiError("Invalid Link"), 401);
+		return next(new ApiError("Invalid Link", 401));
 	}
 	const [[userData]] = user;
 	await VerificationToken.deleteById(rows.id);
 	userData.isVerified = true;
 	const { email, password } = userData;
-	console.log(email, password);
-	// Making an HTTP GET request to another route '/route2'
-	const response = await axios.post(
-		`${process.env.CLIENT_DOMAIN}/api/v1/auth/signIn`,
-		{ email, password }
-	);
 	// 3.generate token
 	const token = createToken(
 		[userData.id, userData.email],

@@ -1,5 +1,6 @@
 const db = require("../config/database");
-
+const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcrypt");
 class Student {
 	// constructor
 	constructor(
@@ -19,10 +20,13 @@ class Student {
 		this.adminCreator = adminCreator;
 		this.idGroupe = idGroupe;
 	}
-	save() {
+	async save() {
+		// Hash the password before saving
+		this.password = await bcrypt.hash(this.password, 12);
 		return db.execute(
-			`INSERT INTO students (fullName , email , password ,color,isVerified, adminCreator, idGroupe) VALUES (?,?,?,?,?,?,?) `,
+			`INSERT INTO students (id ,fullName , email , password ,color,isVerified, adminCreator, idGroupe) VALUES (?,?,?,?,?,?,?,?) `,
 			[
+				uuidv4(),
 				this.fullName,
 				this.email,
 				this.password,
@@ -37,11 +41,8 @@ class Student {
 		return db.execute("SELECT * FROM students");
 	}
 
-	static findByEmailAndPassword(email, password) {
-		return db.execute(
-			"SELECT * FROM `students` WHERE `email` = ? AND `password` = ?",
-			[email, password]
-		);
+	static findByEmail(email) {
+		return db.execute("SELECT * FROM `students` WHERE `email` = ?", [email]);
 	}
 	static findById(id) {
 		return db.execute("SELECT * FROM students WHERE `id` = ?  ", [id]);

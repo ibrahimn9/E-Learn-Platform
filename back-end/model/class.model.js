@@ -1,12 +1,16 @@
 const db = require("../config/database");
+const { v4: uuidv4 } = require("uuid");
 class Class {
 	// constructor
-	constructor(name,specialty) {
+	constructor(name, specialty) {
 		this.name = name;
-		this.specialty= specialty
+		this.specialty = specialty;
 	}
 	save() {
-		return db.execute(`INSERT INTO classes (name,specialty) VALUES (?,?) `, [this.name , this.specialty]);
+		return db.execute(
+			`INSERT INTO classes (id,name,specialty) VALUES (?,?,?) `,
+			[uuidv4(), this.name, this.specialty]
+		);
 	}
 	static fetchAll() {
 		return db.execute("SELECT * FROM classes");
@@ -16,5 +20,4 @@ class Class {
 	}
 }
 
-
-module.exports = Class
+module.exports = Class;
