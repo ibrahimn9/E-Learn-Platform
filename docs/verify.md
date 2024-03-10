@@ -22,11 +22,11 @@
 
       "message": "Your account verified",
       "userData": {
-            "id": "25e4dd71-cfd4-4850-a584-07271f47cddc",
+            "id": 2,
             "fullName": "lokmane-teacher",
             "password": "$2b$12$bBA2uFUMwAeiSZ5MxxnKzuUQ8PZwgtWS7lteBrdleYEQ2FTImd40y",
             "email": "zeddoun.lokmane@gmail.com",
-            "adminCreator": "7938246e-b113-46f7-9727-910684304bec",
+            "adminCreator": 1,
             "color": "purple",
             "isVerified": true
       },
@@ -48,7 +48,7 @@
 
       "status": "Error",
       "err": {
-            "statusCode": 500,
+            "statusCode": 401,
             "status": "Error",
             "isOperational": true
       },
