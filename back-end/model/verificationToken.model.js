@@ -9,7 +9,7 @@ class VerificationToken {
 	save() {
 		return db.execute(
 			`INSERT INTO verificationToken (idUser, token ,role) VALUES (?,?,?) `,
-			[ this.idUser, this.token, this.role]
+			[this.idUser, this.token, this.role]
 		);
 	}
 	static deleteById(id) {
@@ -25,6 +25,12 @@ class VerificationToken {
 		return db.execute(
 			"SELECT * FROM verificationToken WHERE `idUser` = ? AND `token`=?",
 			[userId, token]
+		);
+	}
+	static findByUserIdAndRole(userId, role) {
+		return db.execute(
+			"SELECT * FROM verificationToken WHERE `idUser` = ? AND `role`=?",
+			[userId, role]
 		);
 	}
 }

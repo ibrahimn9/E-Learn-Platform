@@ -51,16 +51,13 @@ const signInController = asyncHandler(async (req, res, next) => {
 		}
 	}
 	// Compare The password With The hashed Password In Database
-	if (
-		!userData ||
-		!(await bcrypt.compare(password, userData.password))
-	) {
+	if (!userData || !(await bcrypt.compare(password, userData.password))) {
 		return next(new ApiError("Invalid email or password", 401));
 	}
 	//  2.Check if The user have signIn in our platform {isVerified}
 	if (userData.isVerified) {
 		// 3.generate token
-		const token = createToken( 
+		const token = createToken(
 			[userData.id, userData.email],
 			process.env.JWT_SECRET_KEY
 		);
@@ -72,6 +69,12 @@ const signInController = asyncHandler(async (req, res, next) => {
 			.status(200)
 			.json({ message: "Logged in successfully", userData, role });
 	} else {
+		// Check if Email Was Sent Before 
+		const to = await VerificationToken.findByUserIdAndRole(userData.id, role); 
+		if (to[0][0]) {
+			return next(new ApiError("Email Already Sent", 401));
+		}
+		
 		// 3.create new verification token
 		// Creating new VerificationToken & save it toDB
 		const token = crypto.randomBytes(32).toString("hex");
@@ -128,7 +131,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	const [[rows], fields] = verificationToken;
 
 	if (!rows) {
-		return next(new ApiError("Invalid Link",401));
+		return next(new ApiError("Invalid Link", 401));
 	}
 	let user;
 	const role = rows.role;
@@ -167,4 +170,4 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 		.json({ message: "Your account verified", userData, role });
 });
 
-module.exports = {signInController , verifyUserAccountCtrl}
+module.exports = { signInController, verifyUserAccountCtrl };
