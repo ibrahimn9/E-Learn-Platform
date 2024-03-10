@@ -1,5 +1,4 @@
 const db = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
 class Cohort {
 	// constructor
 	constructor(groupeNumber, totalMember, idClass, adminCreator) {
@@ -10,9 +9,8 @@ class Cohort {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO cohorts (id,groupeNumber, totalMember, idClass, adminCreator) VALUES (?,?,?,?,?) `,
+			`INSERT INTO cohorts (groupeNumber, totalMember, idClass, adminCreator) VALUES (?,?,?,?) `,
 			[
-				uuidv4(),
 				this.groupeNumber,
 				this.totalMember,
 				this.idClass,

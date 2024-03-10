@@ -1,5 +1,4 @@
 const db = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
 class VerificationToken {
 	// constructor
 	constructor(idUser, token, role) {
@@ -9,8 +8,8 @@ class VerificationToken {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO verificationToken (id,idUser, token ,role) VALUES (?,?,?,?) `,
-			[uuidv4(), this.idUser, this.token, this.role]
+			`INSERT INTO verificationToken (idUser, token ,role) VALUES (?,?,?) `,
+			[ this.idUser, this.token, this.role]
 		);
 	}
 	static deleteById(id) {

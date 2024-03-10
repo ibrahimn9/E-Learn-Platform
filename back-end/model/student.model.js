@@ -1,5 +1,4 @@
 const db = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 class Student {
 	// constructor
@@ -24,9 +23,8 @@ class Student {
 		// Hash the password before saving
 		this.password = await bcrypt.hash(this.password, 12);
 		return db.execute(
-			`INSERT INTO students (id ,fullName , email , password ,color,isVerified, adminCreator, idGroupe) VALUES (?,?,?,?,?,?,?,?) `,
+			`INSERT INTO students (fullName , email , password ,color,isVerified, adminCreator, idGroupe) VALUES (?,?,?,?,?,?,?) `,
 			[
-				uuidv4(),
 				this.fullName,
 				this.email,
 				this.password,

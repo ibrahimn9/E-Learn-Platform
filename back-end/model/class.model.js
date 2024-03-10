@@ -1,5 +1,4 @@
 const db = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
 class Class {
 	// constructor
 	constructor(name, specialty) {
@@ -8,8 +7,8 @@ class Class {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO classes (id,name,specialty) VALUES (?,?,?) `,
-			[uuidv4(), this.name, this.specialty]
+			`INSERT INTO classes (name,specialty) VALUES (?,?) `,
+			[ this.name, this.specialty]
 		);
 	}
 	static fetchAll() {
