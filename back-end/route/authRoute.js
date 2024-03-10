@@ -13,10 +13,10 @@ router.post("/signIn",signInValidator ,  signInController);
 // /api/v1/auth/:userId/verify/:token
 router.get("/:userId/verify/:token", verifyUserAccountCtrl);
 
-// router.post('/forgot-password',forgotPasswordController);
+router.post('/forgot-password',forgotPasswordController);
 
-// router.post('/reset-password/:token',resetPasswordController);
+router.post('/reset-password/:token',resetPasswordController);
 
-// router.post('/logOut',logoutController);
+router.post('/logOut',logoutController);
 
 module.exports = router;

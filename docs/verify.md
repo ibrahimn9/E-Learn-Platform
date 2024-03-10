@@ -6,7 +6,7 @@
 
 **Method** : `GET`
 
-![Alt Text](email_verification.png)
+![Email Verification Example](email_verification.png)
 **Auth required** : NO
 
 

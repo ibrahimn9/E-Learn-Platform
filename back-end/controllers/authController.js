@@ -69,12 +69,12 @@ const signInController = asyncHandler(async (req, res, next) => {
 			.status(200)
 			.json({ message: "Logged in successfully", userData, role });
 	} else {
-		// Check if Email Was Sent Before 
-		const to = await VerificationToken.findByUserIdAndRole(userData.id, role); 
+		// Check if Email Was Sent Before
+		const to = await VerificationToken.findByUserIdAndRole(userData.id, role);
 		if (to[0][0]) {
 			return next(new ApiError("Email Already Sent", 401));
 		}
-		
+
 		// 3.create new verification token
 		// Creating new VerificationToken & save it toDB
 		const token = crypto.randomBytes(32).toString("hex");
@@ -170,4 +170,198 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 		.json({ message: "Your account verified", userData, role });
 });
 
-module.exports = { signInController, verifyUserAccountCtrl };
+// Authorization
+
+exports.protect = asyncHandler(async (req, res, next) => {
+	// 1) check if token exist
+	let token;
+	if (req.cookies["access_token"]) {
+		token = req.cookies.access_token;
+	}
+	if (!token)
+		return next(
+			new ApiError(
+				"You are not log in , Please log in to access to this route ",
+				401
+			)
+		);
+
+	// 2) verify the token (no changes happen , expired token ) :: if change happen in the payload or the token is expired
+	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+	// 3) verify if the user exist in database (this step is important when user is deleted by admin he also has the ability to access route because have the token )
+// Under The process 
+
+	// next();
+});
+
+/**-----------------------------------------------
+ * @desc    Sign out User
+ * @route   /api/auth/logOut
+ * @method  POST
+ * @access  public
+ ------------------------------------------------*/
+
+const logoutController = asyncHandler(async (req, res, next) => {
+	// Clear the access token cookie
+	res.clearCookie("access_token");
+
+	res.status(200).json({ message: "Logged out successfully" });
+});
+
+/**-----------------------------------------------
+ * @desc    forget password for user
+ * @route   /api/auth/forgot-password
+ * @method  POST
+ * @access  public
+ ------------------------------------------------*/
+
+const forgotPasswordController = asyncHandler(async (req, res, next) => {
+	// 1. Validate user input
+	const { email } = req.body;
+	if (!email) {
+		return next(new ApiError("Email is required", 400));
+	}
+
+	// 2. Generate reset token
+	const token = crypto.randomBytes(32).toString("hex");
+
+	// 3. Update user record with reset token
+	let role;
+	let userData;
+
+	// Determine the type of user based on email domain or other criteria
+	const [[student]] = await Student.findByEmail(email);
+	if (student) {
+		userData = student;
+		role = "student";
+	} else {
+		// Search for teacher
+		const [[teacher]] = await Teacher.findByEmail(email);
+		if (teacher) {
+			userData = teacher;
+			role = "teacher";
+		} else {
+			// Search for admin
+			const [[admin]] = await Admin.findByEmail(email);
+			if (admin) {
+				userData = admin;
+				role = "admin";
+			}
+		}
+	}
+
+	if (!userData) {
+		return next(new ApiError("User not found", 404));
+	}
+
+	let verificationToken;
+	try {
+		// Update reset token based on user type
+		verificationToken = new VerificationToken(userData.id, token, role);
+		await verificationToken.save();
+	} catch (error) {
+		return next(new ApiError("Failed to update reset token", 500));
+	}
+
+	// 4. Send reset instructions
+	const resetLink = `${process.env.CLIENT_DOMAIN}/reset-password?token=${token}`;
+
+	try {
+		let emailTemplate;
+		ejs
+			.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
+				user_fullName: capitalizeUserName(userData.fullName),
+				confirm_link: resetLink,
+				logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
+			})
+			.then(async (result) => {
+				emailTemplate = result;
+				try {
+					await sendEmail({
+						email: userData.email,
+						subject: "forgot-password Link to E-Learn Platform",
+						message: emailTemplate,
+					});
+				} catch (err) {
+					return next(
+						new ApiError(
+							"There is an error in the Sending Email . Please try again",
+							500
+						)
+					);
+				}
+			})
+			.catch((err) => {
+				return next(
+					new ApiError(
+						"Email Was Not Sent , Error While Rendering the Ejs file "
+					),
+					401
+				);
+			});
+	} catch (error) {
+		return next(new ApiError("Failed to send reset instructions", 500));
+	}
+
+	res
+		.status(200)
+		.json({ message: "Reset instructions sent to your email", token: token });
+});
+
+/**-----------------------------------------------
+ * @desc    reset password for user
+ * @route   /api/auth/reset-password/:token
+ * @method  POST
+ * @access  public
+ ------------------------------------------------*/
+
+const resetPasswordController = asyncHandler(async (req, res, next) => {
+	const { newPassword } = req.body;
+	const { token } = req.params;
+	const [rows] = await VerificationToken.findByToken(token);
+	// 1. Validate token and new password
+	if (!token || !newPassword || !rows[0].role) {
+		return next(new ApiError("Token and new password are required", 400));
+	}
+	// 2. Verify token and update password
+	let user;
+	let data;
+	let role = rows[0].role;
+
+	// Find user by reset token
+	if (role === "student") {
+		user = await Student.findById(rows[0].idUser);
+		data = user[0][0];
+	} else if ((role = "teacher")) {
+		user = await Teacher.findById(rows[0].idUser);
+		data = user[0][0];
+	} else {
+		user = await Admin.findById(rows[0].idUser);
+		data = user[0][0];
+	}
+	if (!data) {
+		return next(new ApiError("Invalid or expired token", 400));
+	}
+	const hashedPw = await bcrypt.hash(newPassword, 12);
+	console.log(hashedPw, data.id);
+	// Update password based on user type
+	if (role === "student") {
+		await Student.updatePassword(hashedPw, data.id);
+	} else if (role === "teacher") {
+		await Teacher.updatePassword(hashedPw, data.id);
+	} else if (user.role === "admin") {
+		await Admin.updatePassword(hashedPw, data.id);
+	}
+	await VerificationToken.deleteById(rows[0].id);
+
+	res.status(200).json({ message: "Password updated successfully" });
+});
+
+module.exports = {
+	signInController,
+	verifyUserAccountCtrl,
+	logoutController,
+	forgotPasswordController,
+	resetPasswordController,
+};
