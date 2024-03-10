@@ -53,7 +53,7 @@ class Student {
 			[isVerified, id]
 		);
 	}
-	static updatePassword(id,password) {
+	static updatePassword(password,id) {
 		return db.execute(
 			`UPDATE students 
               SET password = ?
