@@ -1,6 +1,6 @@
-const db = require("../config/database")
+const db = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
 class Teacher {
 	// constructor
 	constructor(fullName, email, password, color, isVerified, adminCreator) {
@@ -8,7 +8,7 @@ class Teacher {
 		this.email = email;
 		this.password = password;
 		this.color = color;
-		this.isVerified = isVerified;
+		this.isVerified = isVerified || false;
 		this.adminCreator = adminCreator;
 	}
 	async save() {

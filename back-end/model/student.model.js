@@ -16,7 +16,7 @@ class Student {
 		this.email = email;
 		this.password = password;
 		this.color = color;
-		this.isVerified = isVerified;
+		this.isVerified = isVerified || false;
 		this.adminCreator = adminCreator;
 		this.idGroupe = idGroupe;
 	}

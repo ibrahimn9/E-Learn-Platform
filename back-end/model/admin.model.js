@@ -8,13 +8,13 @@ class Admin {
 		this.email = email;
 		this.password = password;
 		this.color = color;
-		this.isVerified = isVerified;
+		this.isVerified = isVerified || false;
 	}
 	async save() {
 		// Hash the password before saving
 		this.password = await bcrypt.hash(this.password, 12);
 		return db.execute(
-			`INSERT INTO admins (id,fullName , email , password ,color , isVerified) VALUES (?,?,?,?,?) `,
+			`INSERT INTO admins (id,fullName , email , password ,color , isVerified) VALUES (?,?,?,?,?,?) `,
 			[
 				uuidv4(),
 				this.fullName,
