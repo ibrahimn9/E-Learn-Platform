@@ -77,6 +77,24 @@
 	"stack": "Error: Invalid email or password\n    at /home/lokmane-zed/Desktop/E-Learn/E-Learn-Platform/back-end/controllers/authController.js:55:15\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
 }
 ```
+**Condition** : If Already Email Sent.
+
+**Code** : `401 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+    "status": "failed",
+    "err": {
+        "statusCode": 401,
+        "status": "failed",
+        "isOperational": true
+    },
+    "message": "Email Already Sent",
+    "stack": "Error: Email Already Sent\n    at /home/lokmane-zed/Desktop/E-Learn/E-Learn-Platform/back-end/controllers/authController.js:75:16\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+}
+```
 
 **Validation Error** : .
 
