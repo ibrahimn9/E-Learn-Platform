@@ -32,12 +32,6 @@ class Admin {
 	static findByEmail(email) {
 		return db.execute("SELECT * FROM `admins` WHERE `email` = ?", [email]);
 	}
-	static findByEmail(email) {
-		return db.execute(
-			"SELECT * FROM `admins` WHERE `email` = ? ",
-			[email]
-		);
-	}
 	static findById(id) {
 		return db.execute("SELECT * FROM admins WHERE `id` = ?  ", [id]);
 	}

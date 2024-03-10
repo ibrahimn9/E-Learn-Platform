@@ -9,7 +9,7 @@ class VerificationToken {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO verificationToken (id,idUser, token ,role) VALUES (?,?,?) `,
+			`INSERT INTO verificationToken (id,idUser, token ,role) VALUES (?,?,?,?) `,
 			[uuidv4(), this.idUser, this.token, this.role]
 		);
 	}

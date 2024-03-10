@@ -128,7 +128,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	const [[rows], fields] = verificationToken;
 
 	if (!rows) {
-		return next(new ApiError("Invalid Link"), 401);
+		return next(new ApiError("Invalid Link",401));
 	}
 	let user;
 	const role = rows.role;

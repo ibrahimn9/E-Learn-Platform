@@ -34,12 +34,6 @@ class Teacher {
 	static findByEmail(email) {
 		return db.execute("SELECT * FROM `teachers` WHERE `email` = ?", [email]);
 	}
-	static findByEmail(email) {
-		return db.execute(
-			"SELECT * FROM `teachers` WHERE `email` = ? AND `password` = ?",
-			[email]
-		);
-	}
 	static findById(id) {
 		return db.execute("SELECT * FROM teachers WHERE `id` = ?  ", [id]);
 	}
