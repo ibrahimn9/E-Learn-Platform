@@ -190,7 +190,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
 	// 3) verify if the user exist in database (this step is important when user is deleted by admin he also has the ability to access route because have the token )
-// Under The process 
+	// Under The process
 
 	// next();
 });
@@ -252,7 +252,7 @@ const forgotPasswordController = asyncHandler(async (req, res, next) => {
 	}
 
 	if (!userData) {
-		return next(new ApiError("User not found", 404));
+		return next(new ApiError("User not found", 401));
 	}
 
 	let verificationToken;
@@ -320,9 +320,10 @@ const resetPasswordController = asyncHandler(async (req, res, next) => {
 	const { newPassword } = req.body;
 	const { token } = req.params;
 	const [rows] = await VerificationToken.findByToken(token);
+
 	// 1. Validate token and new password
-	if (!token || !newPassword || !rows[0].role) {
-		return next(new ApiError("Token and new password are required", 400));
+	if (!rows[0]) {
+		return next(new ApiError("Invalid Token", 400));
 	}
 	// 2. Verify token and update password
 	let user;
@@ -344,7 +345,6 @@ const resetPasswordController = asyncHandler(async (req, res, next) => {
 		return next(new ApiError("Invalid or expired token", 400));
 	}
 	const hashedPw = await bcrypt.hash(newPassword, 12);
-	console.log(hashedPw, data.id);
 	// Update password based on user type
 	if (role === "student") {
 		await Student.updatePassword(hashedPw, data.id);
@@ -358,10 +358,84 @@ const resetPasswordController = asyncHandler(async (req, res, next) => {
 	res.status(200).json({ message: "Password updated successfully" });
 });
 
+const resendEmail = asyncHandler(async (req, res, next) => {
+	const { email } = req.body;
+	// Search for the user in every single table (Student , Teacher , Admin)
+	let role;
+	let userData; // Variable to hold user data
+	// Search for student
+	const [[student]] = await Student.findByEmail(email);
+	if (student) {
+		userData = student;
+		role = "student";
+	} else {
+		// Search for teacher
+		const [[teacher]] = await Teacher.findByEmail(email);
+		if (teacher) {
+			userData = teacher;
+			role = "teacher";
+		} else {
+			// Search for admin
+			const [[admin]] = await Admin.findByEmail(email);
+			if (admin) {
+				userData = admin;
+				role = "admin";
+			}
+		}
+	}
+	// Compare The password With The hashed Password In Database
+	if (!userData) {
+		return next(new ApiError("Invalid email", 401));
+	}
+	// Clear The Verification Token That was Sent
+	await VerificationToken.deleteAll(userData.id, role);
+
+	// 3.create new verification token
+	// Creating new VerificationToken & save it toDB
+	const token = crypto.randomBytes(32).toString("hex");
+	const verificationToken = new VerificationToken(userData.id, token, role);
+	await verificationToken.save();
+	// 4.Send Link To User Email That will verify him
+	let emailTemplate;
+	ejs
+		.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
+			user_fullName: capitalizeUserName(userData.fullName),
+			confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
+			logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
+		})
+		.then(async (result) => {
+			emailTemplate = result;
+			try {
+				await sendEmail({
+					email: userData.email,
+					subject: "Verification Link to E-Learn Platform",
+					message: emailTemplate,
+				});
+			} catch (err) {
+				return next(
+					new ApiError(
+						"There is an error in the Sending Email . Please try again",
+						500
+					)
+				);
+			}
+		})
+		.catch((err) => {
+			return next(
+				new ApiError(
+					"Email Was Not Sent , Error While Rendering the Ejs file "
+				),
+				401
+			);
+		});
+	res.status(200).json({ message: `Email Verification Was sent To user` });
+});
+
 module.exports = {
 	signInController,
 	verifyUserAccountCtrl,
 	logoutController,
 	forgotPasswordController,
 	resetPasswordController,
+	resendEmail,
 };

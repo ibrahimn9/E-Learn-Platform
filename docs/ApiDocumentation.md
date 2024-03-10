@@ -6,9 +6,14 @@
 
 Open endpoints require no Authentication.
 
-- [sign-In](signIn.md) : `POST {host}/api/v1/auth/signIn/`
+- [sign-In](./authentification/signIn.md) : `POST {host}/api/v1/auth/signIn/`
 
-- [Email-verify-Link](verify.md) : `GET {host}/api/v1/auth/:userId/verify/:token`
+- [Email-verify-Link](./authentification/verify.md) : `GET {host}/api/v1/auth/:userId/verify/:token`
+- [Resend Email](./authentification/resend.md) : `POST {host}/api/v1/auth/resend-email`
+- [Forget-Password](./authentification/forget-password.md) : `POST {host}/api/v1/auth/forgot-password`
+- [reset-Password](./authentification/reset-password.md) : `POST {host}/api/v1/auth/forgot-password`
+- [logOut](./authentification/logOut.md) : `POST {host}/api/v1/auth/reset-password/:token`
+ 
 
 ## Endpoints that require Authentication
 

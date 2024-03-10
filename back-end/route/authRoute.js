@@ -4,19 +4,36 @@ const {
 	verifyUserAccountCtrl,
 	logoutController,
 	forgotPasswordController,
-	resetPasswordController
+	resetPasswordController,
+	resendEmail,
 } = require("../controllers/authController.js");
-const {signInValidator} = require("../utils/validator/authValidator.js")
+const { signInValidator } = require("../utils/validator/authValidator.js");
+const {
+	forgetPasswordValidator,
+} = require("../utils/validator/forgetPasswordValidator.js");
+const {
+	resetPasswordValidator,
+} = require("../utils/validator/resetPasswordValidator.js");
 const router = express.Router();
 
-router.post("/signIn",signInValidator ,  signInController);
+router.post("/signIn", signInValidator, signInController);
 // /api/v1/auth/:userId/verify/:token
 router.get("/:userId/verify/:token", verifyUserAccountCtrl);
 
-router.post('/forgot-password',forgotPasswordController);
+router.post("/resend-Email", forgetPasswordValidator, resendEmail);
 
-router.post('/reset-password/:token',resetPasswordController);
+router.post(
+	"/forgot-password",
+	forgetPasswordValidator,
+	forgotPasswordController
+);
 
-router.post('/logOut',logoutController);
+router.post(
+	"/reset-password/:token",
+	resetPasswordValidator,
+	resetPasswordController
+);
+
+router.post("/logOut", logoutController);
 
 module.exports = router;

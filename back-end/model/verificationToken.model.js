@@ -15,8 +15,16 @@ class VerificationToken {
 	static deleteById(id) {
 		return db.execute(`DELETE FROM verificationToken WHERE id=? `, [id]);
 	}
+	static deleteAll(idUser, role) {
+		return db.execute(
+			`DELETE FROM verificationToken WHERE idUser =? And role =?`,
+			[idUser, role]
+		);
+	}
 	static findByToken(token) {
-		return db.execute(`SELECT * FROM verificationToken WHERE token=? `, [token]);
+		return db.execute(`SELECT * FROM verificationToken WHERE token=? `, [
+			token,
+		]);
 	}
 	static fetchAll() {
 		return db.execute("SELECT * FROM verificationToken");
