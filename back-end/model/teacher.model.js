@@ -1,5 +1,4 @@
 const db = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 class Teacher {
 	// constructor
@@ -30,6 +29,12 @@ class Teacher {
 		return db.execute("SELECT * FROM teachers");
 	}
 
+	static searchByNameOrEmail(email) {
+		return db.execute("SELECT * FROM teachers WHERE email = ? OR fullName = ?", [
+			email,
+			email,
+		]);
+	}
 	static findByEmail(email) {
 		return db.execute("SELECT * FROM `teachers` WHERE `email` = ?", [email]);
 	}

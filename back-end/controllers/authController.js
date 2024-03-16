@@ -1,6 +1,5 @@
 const path = require("path");
 const crypto = require("crypto");
-const express = require("express");
 const ejs = require("ejs");
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
@@ -11,7 +10,9 @@ const VerificationToken = require("../model/verificationToken.model.js");
 const ApiError = require("../utils/ApiError.js");
 const createToken = require("../utils/createToken.js");
 const sendEmail = require("../utils/sendEmail.js");
-const axios = require("axios");
+const jwt = require("jsonwebtoken");
+
+const { allowedNodeEnvironmentFlags } = require("process");
 
 function capitalizeUserName(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -57,10 +58,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 	//  2.Check if The user have signIn in our platform {isVerified}
 	if (userData.isVerified) {
 		// 3.generate token
-		const token = createToken(
-			[userData.id, userData.email],
-			process.env.JWT_SECRET_KEY
-		);
+		const token = createToken([userData.id, role], process.env.JWT_SECRET_KEY);
 		res
 			.cookie("access_token", token, {
 				httpOnly: true,
@@ -157,10 +155,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	userData.isVerified = true;
 	const { email, password } = userData;
 	// 3.generate token
-	const token = createToken(
-		[userData.id, userData.email],
-		process.env.JWT_SECRET_KEY
-	);
+	const token = createToken([userData.id, role], process.env.JWT_SECRET_KEY);
 	res
 		.cookie("access_token", token, {
 			httpOnly: true,
@@ -172,7 +167,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 
 // Authorization
 
-exports.protect = asyncHandler(async (req, res, next) => {
+const protect = asyncHandler(async (req, res, next) => {
 	// 1) check if token exist
 	let token;
 	if (req.cookies["access_token"]) {
@@ -182,7 +177,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 		return next(
 			new ApiError(
 				"You are not log in , Please log in to access to this route ",
-				401
+				400
 			)
 		);
 
@@ -190,10 +185,41 @@ exports.protect = asyncHandler(async (req, res, next) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
 	// 3) verify if the user exist in database (this step is important when user is deleted by admin he also has the ability to access route because have the token )
-	// Under The process
-
-	// next();
+	const role = decoded.role;
+	if (role === "student") {
+		// Searching in the students table
+		user = await Student.findById(decoded.userId);
+	} else if (role === "teacher") {
+		// Searching in the teachers table
+		user = await Teacher.findById(decoded.userId);
+	} else {
+		// Searching in the admins table
+		user = await Admin.findById(decoded.userId);
+	}
+	if (!user) {
+		return next(
+			new ApiError(
+				"The user that belong to this token has no longer exist ",
+				400
+			)
+		);
+	}
+	req.role = role;
+	req.user = user[0][0];
+	next();
 });
+
+const allowedTo = (...roles) =>
+	// 1) access roles ;
+	// 2) access user register ;
+	asyncHandler(async (req, res, next) => {
+		if (!roles.includes(req.role)) {
+			return next(
+				new ApiError("You are not allowed to access this route ", 403)
+			);
+		}
+		next();
+	});
 
 /**-----------------------------------------------
  * @desc    Sign out User
@@ -438,4 +464,6 @@ module.exports = {
 	forgotPasswordController,
 	resetPasswordController,
 	resendEmail,
+	allowedTo,
+	protect,
 };
