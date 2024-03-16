@@ -9,7 +9,7 @@ class Student {
 		color,
 		isVerified,
 		adminCreator,
-		idGroupe
+		idCohorte
 	) {
 		this.fullName = fullName;
 		this.email = email;
@@ -17,13 +17,13 @@ class Student {
 		this.color = color;
 		this.isVerified = isVerified || false;
 		this.adminCreator = adminCreator;
-		this.idGroupe = idGroupe;
+		this.idCohorte = idCohorte;
 	}
 	async save() {
 		// Hash the password before saving
 		this.password = await bcrypt.hash(this.password, 12);
 		return db.execute(
-			`INSERT INTO students (fullName , email , password ,color,isVerified, adminCreator, idGroupe) VALUES (?,?,?,?,?,?,?) `,
+			`INSERT INTO students (fullName , email , password ,color,isVerified, adminCreator, idCohorte) VALUES (?,?,?,?,?,?,?) `,
 			[
 				this.fullName,
 				this.email,
@@ -31,7 +31,7 @@ class Student {
 				this.color,
 				this.isVerified,
 				this.adminCreator,
-				this.idGroupe,
+				this.idCohorte,
 			]
 		);
 	}
