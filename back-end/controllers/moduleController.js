@@ -4,7 +4,7 @@ const cohort = require("../model/cohort.model");
 const Class = require("../model/class.model");
 const Teacher = require("../model/teacher.model");
 const Module = require("../model/module.class");
-const associationModuleTeacher = require("../model/associationModuleTeacher");
+const associationModuleTeacher = require("../model/module_teacher_association.model");
 const associationCohortModule = require("../model/module_cohorte_association.model");
 
 /**-----------------------------------------------
