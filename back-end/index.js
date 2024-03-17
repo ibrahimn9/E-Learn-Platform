@@ -9,6 +9,7 @@ const routerAuth = require("./route/authRoute.js");
 const cohortRoute = require("./route/cohortRoute");
 const moduleRoute = require("./route/moduleRoute");
 const classRoute = require("./route/classRoute.js");
+const userRoute = require("./route/userRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const PORT = process.env.PORT;
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/v1/auth", routerAuth);
 app.use("/api/v1/cohort", cohortRoute);
 app.use("/api/v1/module", moduleRoute);
 app.use("/api/v1/class", classRoute);
+app.use("/api/v1/users", userRoute);
 
 // For Unmounted Url
 app.all("*", (req, res, next) => {
@@ -40,9 +42,9 @@ app.all("*", (req, res, next) => {
 app.use(globalError);
 
 const server = http.createServer(app);
-const Server = server.listen(PORT, async () => {
+server.listen(PORT, async () => {
 	try {
-		const connection = await pool.execute("SELECT 1");
+		await pool.execute("SELECT 1");
 		console.log(`Connected To Database `);
 		console.log(`Server is Listening on PORT ${PORT}`);
 	} catch (error) {

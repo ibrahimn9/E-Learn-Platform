@@ -24,13 +24,13 @@ class Class {
 		);
 	}
 	static updateSpecialty(specialty, id) {
-		return db.execute(
-			"UPDATE TABLE classes SET COLUMN specialty = ? WHERE id = ?",
-			[specialty, id]
-		);
+		return db.execute("UPDATE classes SET specialty = ? WHERE id = ?", [
+			specialty,
+			id,
+		]);
 	}
 	static deleteById(id) {
-		return db.execute("DELETE FROM TABLE classes WHERE id = ?", [id]);
+		return db.execute("DELETE FROM  classes WHERE id = ?", [id]);
 	}
 }
 

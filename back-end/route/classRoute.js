@@ -8,16 +8,20 @@ const {
 	addSpecialty,
 	updateSpecialty,
 } = require("../controllers/classControllers");
+const {
+	addSpecialtyValidator,
+	updateSpecialtyValidator,
+} = require("../utils/validator/classValidator");
 
 const authServices = require("../controllers/authController");
 // This route is Authorized For Admin
 router.use(authServices.protect, authServices.allowedTo("admin"));
 
-router.route("/").post(addSpecialty).get(getClassAll);
+router.route("/").post(addSpecialtyValidator, addSpecialty).get(getClassAll);
 router
-	.route("/:cohortId")
+	.route("/:classId")
 	.get(getClassById)
 	.delete(deleteSpecialty)
-	.put(updateSpecialty);
+	.put(updateSpecialtyValidator, updateSpecialty);
 
 module.exports = router;

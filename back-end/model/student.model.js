@@ -36,8 +36,14 @@ class Student {
 	static findByEmail(email) {
 		return db.execute("SELECT * FROM `students` WHERE `email` = ?", [email]);
 	}
+	static findByIdWithinAdmin(id, idAdmin) {
+		return db.execute(
+			"SELECT * FROM students WHERE `id` = ? AND adminCreator = ? ",
+			[id, idAdmin]
+		);
+	}
 	static findById(id) {
-		return db.execute("SELECT * FROM students WHERE `id` = ?  ", [id]);
+		return db.execute("SELECT * FROM students WHERE `id` = ?", [id]);
 	}
 	static updateUserVerified(isVerified, id) {
 		return db.execute(
@@ -47,12 +53,22 @@ class Student {
 			[isVerified, id]
 		);
 	}
-	static updatePassword(password,id) {
+	static updatePassword(password, id) {
 		return db.execute(
 			`UPDATE students 
               SET password = ?
               WHERE id = ?`,
 			[password, id]
+		);
+	}
+	static findByNameOrEmail(name, email, adminCreator) {
+		// Adjust input parameters to handle partial values
+		name = name ? `%${name}%` : null;
+		email = email ? `%${email}%` : null;
+
+		return db.execute(
+			"SELECT * FROM students WHERE (fullName LIKE ? OR ? IS NULL) AND (email LIKE ? OR ? IS NULL) AND adminCreator = ?",
+			[name, name, email, email, adminCreator]
 		);
 	}
 }

@@ -15,18 +15,18 @@ class Module {
 	}
 	static fetchAll(name, idEditor, idClass, semester) {
 		// Check if name ,idEditor , semester is null
-		name = name || null;
+		name = name ? `%${name}%` : null;
 		idEditor = idEditor || null;
 		semester = semester || null;
 		// Check if idClass is null
 		if (idClass) {
 			return db.execute(
-				"SELECT * FROM modules  LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id  WHERE class_module_association.idClass = ? AND (modules.name = ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
+				"SELECT * FROM modules  LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id  WHERE class_module_association.idClass = ? AND (modules.name LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
 				[idClass, name, name, idEditor, idEditor, semester, semester]
 			);
 		} else {
 			return db.execute(
-				"SELECT * FROM modules WHERE  (modules.name = ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
+				"SELECT * FROM modules WHERE  (modules.name  LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
 				[ name, name, idEditor, idEditor, semester, semester]
 			);
 		}
