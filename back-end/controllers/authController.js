@@ -1,6 +1,5 @@
 const path = require("path");
 const crypto = require("crypto");
-const express = require("express");
 const ejs = require("ejs");
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
@@ -11,6 +10,7 @@ const VerificationToken = require("../model/verificationToken.model.js");
 const ApiError = require("../utils/ApiError.js");
 const createToken = require("../utils/createToken.js");
 const sendEmail = require("../utils/sendEmail.js");
+const jwt = require("jsonwebtoken");
 
 function capitalizeUserName(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -51,15 +51,12 @@ const signInController = asyncHandler(async (req, res, next) => {
 	}
 	// Compare The password With The hashed Password In Database
 	if (!userData || !(await bcrypt.compare(password, userData.password))) {
-		return next(new ApiError("Invalid email or password", 401));
+		return next(new ApiError("Invalid email or password", 400));
 	}
 	//  2.Check if The user have signIn in our platform {isVerified}
 	if (userData.isVerified) {
 		// 3.generate token
-		const token = createToken(
-			[userData.id, userData.email],
-			process.env.JWT_SECRET_KEY
-		);
+		const token = createToken([userData.id, role], process.env.JWT_SECRET_KEY);
 		res
 			.cookie("access_token", token, {
 				httpOnly: true,
@@ -70,49 +67,56 @@ const signInController = asyncHandler(async (req, res, next) => {
 	} else {
 		// Check if Email Was Sent Before
 		const to = await VerificationToken.findByUserIdAndRole(userData.id, role);
-		if (to[0][0]) {
-			return next(new ApiError("Email Already Sent", 401));
-		}
-
-		// 3.create new verification token
-		// Creating new VerificationToken & save it toDB
-		const token = crypto.randomBytes(32).toString("hex");
-		const verificationToken = new VerificationToken(userData.id, token, role);
-		await verificationToken.save();
-		// 4.Send Link To User Email That will verify him
-		let emailTemplate;
-		ejs
-			.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
-				user_fullName: capitalizeUserName(userData.fullName),
-				confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
-				logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
-			})
-			.then(async (result) => {
-				emailTemplate = result;
-				try {
-					await sendEmail({
-						email: userData.email,
-						subject: "Verification Link to E-Learn Platform",
-						message: emailTemplate,
-					});
-				} catch (err) {
+		const [[rows], fields] = to;
+		const DateCreated = new Date(rows.created_at);
+		const DateExpiration = DateCreated.getTime() + 20 * 60 * 1000 - Date.now();
+		if (!rows || DateExpiration < 0) {
+			// 3.delete the existing token
+			if (rows) {
+				await VerificationToken.deleteById(rows.id);
+			}
+			// 4.create new verification token
+			// Creating new VerificationToken & save it toDB
+			const token = crypto.randomBytes(32).toString("hex");
+			const verificationToken = new VerificationToken(userData.id, token, role);
+			await verificationToken.save();
+			// 5.Send Link To User Email That will verify him
+			let emailTemplate;
+			ejs
+				.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
+					user_fullName: capitalizeUserName(userData.fullName),
+					confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
+					logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
+				})
+				.then(async (result) => {
+					emailTemplate = result;
+					try {
+						await sendEmail({
+							email: userData.email,
+							subject: "Verification Link to E-Learn Platform",
+							message: emailTemplate,
+						});
+					} catch (err) {
+						return next(
+							new ApiError(
+								"There is an error in the Sending Email . Please try again",
+								500
+							)
+						);
+					}
+				})
+				.catch((err) => {
 					return next(
 						new ApiError(
-							"There is an error in the Sending Email . Please try again",
-							500
+							"Email Was Not Sent , Error While Rendering the Ejs file ",
+							400
 						)
 					);
-				}
-			})
-			.catch((err) => {
-				return next(
-					new ApiError(
-						"Email Was Not Sent , Error While Rendering the Ejs file "
-					),
-					401
-				);
-			});
-		res.status(200).json({ message: `Email Verification Was sent To user` });
+				});
+			res.status(200).json({ message: `Email Verification Was sent To user` });
+		} else {
+			return next(new ApiError("Email Already Sent", 400));
+		}
 	}
 });
 
@@ -129,8 +133,10 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	);
 	const [[rows], fields] = verificationToken;
 
-	if (!rows) {
-		return next(new ApiError("Invalid Link", 401));
+	const DateCreated = new Date(rows.created_at);
+	const DateExpiration = DateCreated.getTime() + 20 * 60 * 1000 - Date.now();
+	if (!rows || DateExpiration < 0) {
+		return next(new ApiError("Invalid Link Or Have Been Expired", 400));
 	}
 	let user;
 	const role = rows.role;
@@ -156,10 +162,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	userData.isVerified = true;
 	const { email, password } = userData;
 	// 3.generate token
-	const token = createToken(
-		[userData.id, userData.email,role],
-		process.env.JWT_SECRET_KEY
-	);
+	const token = createToken([userData.id, role], process.env.JWT_SECRET_KEY);
 	res
 		.cookie("access_token", token, {
 			httpOnly: true,
@@ -171,7 +174,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 
 // Authorization
 
-exports.protect = asyncHandler(async (req, res, next) => {
+const protect = asyncHandler(async (req, res, next) => {
 	// 1) check if token exist
 	let token;
 	if (req.cookies["access_token"]) {
@@ -181,7 +184,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 		return next(
 			new ApiError(
 				"You are not log in , Please log in to access to this route ",
-				401
+				400
 			)
 		);
 
@@ -189,10 +192,41 @@ exports.protect = asyncHandler(async (req, res, next) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
 	// 3) verify if the user exist in database (this step is important when user is deleted by admin he also has the ability to access route because have the token )
-	// Under The process
-
-	// next();
+	const role = decoded.role;
+	if (role === "student") {
+		// Searching in the students table
+		user = await Student.findById(decoded.userId);
+	} else if (role === "teacher") {
+		// Searching in the teachers table
+		user = await Teacher.findById(decoded.userId);
+	} else {
+		// Searching in the admins table
+		user = await Admin.findById(decoded.userId);
+	}
+	if (!user) {
+		return next(
+			new ApiError(
+				"The user that belong to this token has no longer exist ",
+				400
+			)
+		);
+	}
+	req.role = role;
+	req.user = user[0][0];
+	next();
 });
+
+const allowedTo = (...roles) =>
+	// 1) access roles ;
+	// 2) access user register ;
+	asyncHandler(async (req, res, next) => {
+		if (!roles.includes(req.role)) {
+			return next(
+				new ApiError("You are not allowed to access this route ", 403)
+			);
+		}
+		next();
+	});
 
 /**-----------------------------------------------
  * @desc    Sign out User
@@ -437,4 +471,6 @@ module.exports = {
 	forgotPasswordController,
 	resetPasswordController,
 	resendEmail,
+	allowedTo,
+	protect,
 };

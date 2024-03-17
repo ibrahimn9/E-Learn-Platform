@@ -6,7 +6,9 @@ const cookieParser = require("cookie-parser");
 const globalError = require("./middlewares/errorMiddleware.js");
 const pool = require("./config/database.js");
 const routerAuth = require("./route/authRoute.js");
-const routerAdmin = require('./route/adminRoute.js');
+const cohortRoute = require("./route/cohortRoute");
+const moduleRoute = require("./route/moduleRoute");
+const classRoute = require("./route/classRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const PORT = process.env.PORT;
 const app = express();
@@ -25,7 +27,9 @@ if (process.env.NODE_ENV === "development") {
 
 
 app.use("/api/v1/auth", routerAuth);
-app.use('/api/v1/admin',routerAdmin);
+app.use("/api/v1/cohort", cohortRoute);
+app.use("/api/v1/module", moduleRoute);
+app.use("/api/v1/class", classRoute);
 
 // For Unmounted Url
 app.all("*", (req, res, next) => {
