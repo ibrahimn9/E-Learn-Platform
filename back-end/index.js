@@ -8,7 +8,6 @@ const pool = require("./config/database.js");
 const routerAuth = require("./route/authRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const PORT = process.env.PORT;
-const cors = require('cors');
 const app = express();
 
 // Serve static files from the public directory
@@ -16,7 +15,6 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "20kb" }));
 app.use(cookieParser());
-app.use(cors());
 //set express view engine
 if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));

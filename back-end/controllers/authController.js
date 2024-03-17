@@ -85,7 +85,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 		ejs
 			.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
 				user_fullName: capitalizeUserName(userData.fullName),
-				confirm_link: `${process.env.CLIENT_HOST}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
+				confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
 				logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
 			})
 			.then(async (result) => {
@@ -265,7 +265,7 @@ const forgotPasswordController = asyncHandler(async (req, res, next) => {
 	}
 
 	// 4. Send reset instructions
-	const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+	const resetLink = `${process.env.CLIENT_DOMAIN}/reset-password?token=${token}`;
 
 	try {
 		let emailTemplate;
