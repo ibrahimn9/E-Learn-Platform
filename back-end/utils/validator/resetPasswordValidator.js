@@ -9,5 +9,6 @@ exports.resetPasswordValidator = [
 		.withMessage(`Too short Password`)
 		.matches(/\d/)
 		.withMessage("Password must contain at least one digit"),
+
 	validatorMiddleware,
 ];

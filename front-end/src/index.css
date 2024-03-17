@@ -1,1 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Barlow", sans-serif;
+  font-style: normal;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  text-decoration: none;
+  list-style: none;
+}
+
+.auth-bg {
+  background-image: url(./assets/ellipse.svg);
+  background-repeat: no-repeat;
+  position: relative;
+}
+
 
