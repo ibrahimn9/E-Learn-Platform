@@ -2,7 +2,7 @@
 
 const Landing = () => {
   return (
-    <div>Landing</div>
+    <div className="text-red-500">Landing</div>
   )
 }
 
