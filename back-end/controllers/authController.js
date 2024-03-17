@@ -12,6 +12,8 @@ const createToken = require("../utils/createToken.js");
 const sendEmail = require("../utils/sendEmail.js");
 const jwt = require("jsonwebtoken");
 
+const { allowedNodeEnvironmentFlags } = require("process");
+
 function capitalizeUserName(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -67,49 +69,56 @@ const signInController = asyncHandler(async (req, res, next) => {
 	} else {
 		// Check if Email Was Sent Before
 		const to = await VerificationToken.findByUserIdAndRole(userData.id, role);
-		if (to[0][0]) {
-			return next(new ApiError("Email Already Sent", 401));
-		}
-
-		// 3.create new verification token
-		// Creating new VerificationToken & save it toDB
-		const token = crypto.randomBytes(32).toString("hex");
-		const verificationToken = new VerificationToken(userData.id, token, role);
-		await verificationToken.save();
-		// 4.Send Link To User Email That will verify him
-		let emailTemplate;
-		ejs
-			.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
-				user_fullName: capitalizeUserName(userData.fullName),
-				confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
-				logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
-			})
-			.then(async (result) => {
-				emailTemplate = result;
-				try {
-					await sendEmail({
-						email: userData.email,
-						subject: "Verification Link to E-Learn Platform",
-						message: emailTemplate,
-					});
-				} catch (err) {
+		const [[rows], fields] = to;
+		const DateCreated = new Date(rows.created_at);
+		const DateExpiration = DateCreated.getTime() + 20 * 60 * 1000 - Date.now();
+		if (!rows || DateExpiration < 0) {
+			// 3.delete the existing token
+			if (rows) {
+				await VerificationToken.deleteById(rows.id);
+			}
+			// 4.create new verification token
+			// Creating new VerificationToken & save it toDB
+			const token = crypto.randomBytes(32).toString("hex");
+			const verificationToken = new VerificationToken(userData.id, token, role);
+			await verificationToken.save();
+			// 5.Send Link To User Email That will verify him
+			let emailTemplate;
+			ejs
+				.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
+					user_fullName: capitalizeUserName(userData.fullName),
+					confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
+					logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
+				})
+				.then(async (result) => {
+					emailTemplate = result;
+					try {
+						await sendEmail({
+							email: userData.email,
+							subject: "Verification Link to E-Learn Platform",
+							message: emailTemplate,
+						});
+					} catch (err) {
+						return next(
+							new ApiError(
+								"There is an error in the Sending Email . Please try again",
+								500
+							)
+						);
+					}
+				})
+				.catch((err) => {
 					return next(
 						new ApiError(
-							"There is an error in the Sending Email . Please try again",
-							500
+							"Email Was Not Sent , Error While Rendering the Ejs file ",
+							400
 						)
 					);
-				}
-			})
-			.catch((err) => {
-				return next(
-					new ApiError(
-						"Email Was Not Sent , Error While Rendering the Ejs file "
-					),
-					401
-				);
-			});
-		res.status(200).json({ message: `Email Verification Was sent To user` });
+				});
+			res.status(200).json({ message: `Email Verification Was sent To user` });
+		} else {
+			return next(new ApiError("Email Already Sent", 400));
+		}
 	}
 });
 

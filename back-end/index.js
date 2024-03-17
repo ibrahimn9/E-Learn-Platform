@@ -11,6 +11,7 @@ const moduleRoute = require("./route/moduleRoute");
 const classRoute = require("./route/classRoute.js");
 const userRoute = require("./route/userRoute.js");
 const ApiError = require("./utils/ApiError.js");
+const cors = require("cors");
 const PORT = process.env.PORT;
 const app = express();
 
@@ -19,13 +20,12 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "20kb" }));
 app.use(cookieParser());
+app.use(cors());
 //set express view engine
 if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 	console.log(`mode: ${process.env.NODE_ENV}`);
 }
-
-
 
 app.use("/api/v1/auth", routerAuth);
 app.use("/api/v1/cohort", cohortRoute);
