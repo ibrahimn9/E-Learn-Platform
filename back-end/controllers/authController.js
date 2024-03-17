@@ -12,8 +12,6 @@ const createToken = require("../utils/createToken.js");
 const sendEmail = require("../utils/sendEmail.js");
 const jwt = require("jsonwebtoken");
 
-const { allowedNodeEnvironmentFlags } = require("process");
-
 function capitalizeUserName(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }

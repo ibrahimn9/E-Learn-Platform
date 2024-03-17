@@ -1,6 +1,5 @@
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError");
-const cohort = require("../model/cohort.model");
 const Class = require("../model/class.model");
 const Teacher = require("../model/teacher.model");
 const Module = require("../model/module.model");
@@ -16,7 +15,8 @@ const associationModuleClass = require("../model/class_module_association.model"
 ------------------------------------------------*/
 const getModuleAll = asyncHandler(async (req, res, next) => {
 	// get the editor id [teacher]
-	let dataTeacher, dataClass;
+	let dataTeacher = { id: null },
+		dataClass = { id: null };
 	if (req.query.editor) {
 		[[dataTeacher]] = await Teacher.searchByNameOrEmail(req.query.editor);
 		if (!dataTeacher) {
@@ -185,25 +185,38 @@ const updateModule = asyncHandler(async (req, res, next) => {
 		);
 	}
 	const [[module]] = await Module.findById(req.params.moduleId);
-	if (module.id === dataTeacher.id) {
+	if (module.idEditor === dataTeacher.id) {
 		return next(
 			new ApiError(`This Teacher is Already Editor for this module `, 400)
 		);
 	}
-	const { name, description, semester } = req.body;
-	await Module.updateEditor(
-		name,
-		description,
-		semester,
-		dataTeacher.id,
-		req.params.moduleId
-	);
+	try {
+		const association = new associationModuleTeacher(
+			req.params.moduleId,
+			dataTeacher.id
+		);
+		await association.save();
+	} catch (err) {
+		if (err.code === "ER_DUP_ENTRY") {
+			await associationModuleTeacher.deleteByIdModuleAndTeacherId(
+				req.params.moduleId,
+				dataTeacher.id
+			);
+			const association = new associationModuleTeacher(
+				req.params.moduleId,
+				dataTeacher.id
+			);
+			await association.save();
+		} else {
+			throw new Error("Database error: Failed to insert the record.");
+		}
+	}
 	if (req.body.teachers) {
 		if (!req.body.teachers.includes(dataTeacher.id)) {
 			return next(new ApiError(`The Editor Must Include In Teachers`, 400));
 		}
 		// update the teacher-module association (by deleting and inserting new one)
-		await associationModuleTeacher.deleteByIdModule(req.params.moduleId);
+		// await associationModuleTeacher.deleteByIdModule(req.params.moduleId);
 		// association between modules And teacher
 		await Promise.all(
 			req.body.teachers.map(async (teacherId) => {
@@ -211,11 +224,34 @@ const updateModule = asyncHandler(async (req, res, next) => {
 					req.params.moduleId,
 					teacherId
 				);
-				await association.save();
+				try {
+					await association.save();
+				} catch (err) {
+					if (err.code === "ER_DUP_ENTRY") {
+						// Handle duplicate entry error
+						return next(
+							new ApiError(
+								"Duplicate entry error: The  Teacher are already exists In Module",
+								400
+							)
+						);
+					} else {
+						throw new Error("Database error: Failed to insert the record.");
+					}
+				}
 			})
 		);
 	}
-	res.status(200).json({ message: "Module Editor Updated" });
+	const { name, description, semester } = req.body;
+	const data = await Module.updateEditor(
+		name,
+		description,
+		semester,
+		dataTeacher.id,
+		req.params.moduleId
+	);
+
+	res.status(200).json({ message: "Module Updated", data });
 });
 module.exports = {
 	getModuleAll,

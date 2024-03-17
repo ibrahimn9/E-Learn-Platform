@@ -19,6 +19,12 @@ class ModuleTeacherAssociation {
 			[id]
 		);
 	}
+	static deleteByIdModuleAndTeacherId(idModule, idTeacher) {
+		return db.execute(
+			"DELETE FROM module_teacher_association WHERE idModule = ? AND idTeacher = ?",
+			[idModule, idTeacher]
+		);
+	}
 }
 
 module.exports = ModuleTeacherAssociation;

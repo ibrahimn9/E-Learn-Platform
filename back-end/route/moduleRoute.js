@@ -5,6 +5,7 @@ const {
 	deleteModule,
 	getModuleAll,
 	getModuleById,
+	updateModule,
 } = require("../controllers/moduleController");
 
 const { createModuleValidator } = require("../utils/validator/moduleValidator");
@@ -16,6 +17,6 @@ router.get("/:moduleId", authServices.protect, getModuleById);
 // Those EndPoints Are Authorized For Admin
 router.use(authServices.protect, authServices.allowedTo("admin"));
 router.post("/", createModuleValidator, createModule);
-router.delete("/:moduleId", deleteModule);
+router.route("/:moduleId").delete(deleteModule).put(updateModule);
 
 module.exports = router;

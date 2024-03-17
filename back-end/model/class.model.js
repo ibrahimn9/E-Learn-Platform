@@ -11,16 +11,26 @@ class Class {
 			this.specialty,
 		]);
 	}
-	static fetchAll() {
-		return db.execute("SELECT * FROM classes");
+	static fetchById(id) {
+		return db.execute("SELECT * FROM classes WHERE id = ?", [id]);
 	}
 	static findByName(name, specialty) {
 		// Check if groupeNumber is null or undefined, and set it to NULL if it is
 		specialty = specialty || null;
+		name = name || null;
 		return db.execute(
-			"SELECT * FROM classes WHERE `name` = ?  AND (specialty = ? OR ? IS NULL )",
-			[name, specialty, specialty]
+			"SELECT * FROM classes WHERE (name = ? OR ? IS NULL )  AND (specialty = ? OR ? IS NULL )",
+			[name, name, specialty, specialty]
 		);
+	}
+	static updateSpecialty(specialty, id) {
+		return db.execute(
+			"UPDATE TABLE classes SET COLUMN specialty = ? WHERE id = ?",
+			[specialty, id]
+		);
+	}
+	static deleteById(id) {
+		return db.execute("DELETE FROM TABLE classes WHERE id = ?", [id]);
 	}
 }
 
