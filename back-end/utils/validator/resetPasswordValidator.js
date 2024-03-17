@@ -6,6 +6,9 @@ exports.resetPasswordValidator = [
 		.notEmpty()
 		.withMessage(`Password is required`)
 		.isLength({ min: 6 })
-		.withMessage(`Too short Password`),
+		.withMessage(`Too short Password`)
+		.matches(/\d/)
+		.withMessage("Password must contain at least one digit"),
+
 	validatorMiddleware,
 ];
