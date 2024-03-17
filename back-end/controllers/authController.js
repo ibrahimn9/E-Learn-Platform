@@ -11,7 +11,6 @@ const VerificationToken = require("../model/verificationToken.model.js");
 const ApiError = require("../utils/ApiError.js");
 const createToken = require("../utils/createToken.js");
 const sendEmail = require("../utils/sendEmail.js");
-const axios = require("axios");
 
 function capitalizeUserName(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -158,7 +157,7 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	const { email, password } = userData;
 	// 3.generate token
 	const token = createToken(
-		[userData.id, userData.email],
+		[userData.id, userData.email,role],
 		process.env.JWT_SECRET_KEY
 	);
 	res

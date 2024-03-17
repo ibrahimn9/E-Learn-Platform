@@ -6,30 +6,24 @@ class Student {
 		fullName,
 		email,
 		password,
-		color,
-		isVerified,
 		adminCreator,
 		idCohorte
 	) {
 		this.fullName = fullName;
 		this.email = email;
 		this.password = password;
-		this.color = color;
-		this.isVerified = isVerified || false;
 		this.adminCreator = adminCreator;
 		this.idCohorte = idCohorte;
 	}
 	async save() {
 		// Hash the password before saving
 		this.password = await bcrypt.hash(this.password, 12);
-		return db.execute(
-			`INSERT INTO students (fullName , email , password ,color,isVerified, adminCreator, idCohorte) VALUES (?,?,?,?,?,?,?) `,
+		return await db.execute(
+			`INSERT INTO students (fullName , email , password , adminCreator, idCohorte) VALUES (?,?,?,?,?) `,
 			[
 				this.fullName,
 				this.email,
 				this.password,
-				this.color,
-				this.isVerified,
 				this.adminCreator,
 				this.idCohorte,
 			]

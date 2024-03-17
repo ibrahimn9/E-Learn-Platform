@@ -3,25 +3,21 @@ const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 class Teacher {
 	// constructor
-	constructor(fullName, email, password, color, isVerified, adminCreator) {
+	constructor(fullName, email, password, adminCreator) {
 		this.fullName = fullName;
 		this.email = email;
 		this.password = password;
-		this.color = color;
-		this.isVerified = isVerified || false;
 		this.adminCreator = adminCreator;
 	}
 	async save() {
 		// Hash the password before saving
 		this.password = await bcrypt.hash(this.password, 12);
-		return db.execute(
-			`INSERT INTO teachers (fullName , email , password ,color,isVerified , adminCreator) VALUES (?,?,?,?,?,?) `,
+		return await db.execute(
+			`INSERT INTO teachers (fullName , email , password  , adminCreator) VALUES (?,?,?,?) `,
 			[
 				this.fullName,
 				this.email,
 				this.password,
-				this.color,
-				this.isVerified,
 				this.adminCreator,
 			]
 		);

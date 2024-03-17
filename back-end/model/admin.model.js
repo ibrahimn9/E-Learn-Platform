@@ -2,24 +2,20 @@ const db = require("../config/database");
 const bcrypt = require("bcrypt")
 class Admin {
 	// constructor
-	constructor(fullName, email, password, color, isVerified) {
+	constructor(fullName, email, password) {
 		this.fullName = fullName;
 		this.email = email;
 		this.password = password;
-		this.color = color;
-		this.isVerified = isVerified || false;
 	}
 	async save() {
 		// Hash the password before saving
 		this.password = await bcrypt.hash(this.password, 12);
-		return db.execute(
-			`INSERT INTO admins (fullName , email , password ,color , isVerified) VALUES (?,?,?,?,?) `,
+		return await db.execute(
+			`INSERT INTO admins (fullName , email , password ) VALUES (?,?,?) `,
 			[
 				this.fullName,
 				this.email,
 				this.password,
-				this.color,
-				this.isVerified,
 			]
 		);
 	}

@@ -7,9 +7,9 @@ class Cohort {
 		this.idClass = idClass;
 		this.adminCreator = adminCreator;
 	}
-	save() {
-		return db.execute(
-			`INSERT INTO cohorts (groupeNumber, totalMember, idClass, adminCreator) VALUES (?,?,?,?) `,
+	async save() {
+		return await db.execute(
+			`INSERT INTO cohortes (groupeNumber, totalMember, idClass, adminCreator) VALUES (?,?,?,?) `,
 			[
 				this.groupeNumber,
 				this.totalMember,
@@ -18,9 +18,16 @@ class Cohort {
 			]
 		);
 	}
-	static fetchAll() {
-		return db.execute("SELECT * FROM cohorts");
+	static  async fetchAll() {
+		return await db.execute("SELECT * FROM cohorts");
 	}
+	static async getCohortIdByClassAndGroupNumber(idClass, groupeNumber) {
+		return await db.execute(
+			"SELECT id FROM cohortes WHERE idClass = ? AND groupeNumber = ?",
+			[idClass, groupeNumber]
+		);
+	}
+
 }
 
 module.exports = Cohort;
