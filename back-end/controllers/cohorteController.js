@@ -19,7 +19,7 @@ const getCohortAll = asyncHandler(async (req, res, next) => {
 		if (!dataClass) {
 			return next(new ApiError(`there is no class with this name `, 400));
 		}
-	} 
+	}
 	let { groupNumber } = req.query;
 	const result = await cohort.fetchAll(dataClass.id, groupNumber, req.user.id);
 	res.status(200).json({ data: result[0] });
@@ -61,11 +61,22 @@ const createCohort = asyncHandler(async (req, res, next) => {
 	const { groupNumber } = req.body;
 	// insert new Cohort
 	const newCohort = new cohort(groupNumber, dataClass.id, req.user.id);
-	const data = await newCohort.save();
-	if (!data[0]) {
-		return next(new ApiError(`there is error in creating cohort`, 400));
+	try {
+		const data = await newCohort.save();
+	} catch (err) {
+		if (err.code === "ER_DUP_ENTRY") {
+			// Handle duplicate entry error
+			return next(
+				new ApiError(
+					"Duplicate entry error: The combination of idClass and groupeNumber already exists.",
+					400
+				)
+			);
+		} else {
+			throw new Error("Database error: Failed to insert the record.");
+		}
 	}
-	// Create the association cohort_module
+	// Create the association cohort_teacher
 	const { teachers } = req.body;
 	teachers.map(async (teacherId) => {
 		const association = new associationCohortTeacher(
@@ -74,6 +85,9 @@ const createCohort = asyncHandler(async (req, res, next) => {
 		);
 		await association.save();
 	});
+	// create the association module_cohort
+	const [modules] = await cohort.fetchModulesWithinClass(dataClass.id);
+	console.log(modules);
 
 	res.status(201).json({ message: "Cohort Created" });
 });

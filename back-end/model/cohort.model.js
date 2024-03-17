@@ -29,6 +29,12 @@ class Cohort {
 			[idClass, idClass, groupeNumber, groupeNumber, adminCreator]
 		);
 	}
+	static fetchModulesWithinClass(idClass) {
+		return db.execute(
+			"SELECT idModule FROM cohort LEFT JOIN class_module_association ON cohorts.idClass = class_module_association.idClass WHERE cohorts.idClass = ?",
+			[idClass]
+		);
+	}
 	static deleteById(id) {
 		return db.execute("DELETE FROM cohorts WHERE id = ?", [id]);
 	}

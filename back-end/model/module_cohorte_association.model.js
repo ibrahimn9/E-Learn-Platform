@@ -7,7 +7,7 @@ class ModuleCohorteAssociation {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO module_cohorte_association (idModule,idCohort) VALUES (?,?) `,
+			`INSERT INTO module_cohorte_association (idModule,idCohorte) VALUES (?,?) `,
 			[this.idModule, this.idCohorte]
 		);
 	}

@@ -6,8 +6,8 @@ class ClassModuleAssociation {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO class_module_association (idClass,idModule) VALUES (?,?) `,
-			[this.idClass, this.idModule]
+			`INSERT INTO class_module_association (idModule,idClass) VALUES (?,?) `,
+			[this.idModule, this.idClass]
 		);
 	}
 	static fetchAll() {

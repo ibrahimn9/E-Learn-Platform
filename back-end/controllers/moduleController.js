@@ -3,19 +3,20 @@ const ApiError = require("../utils/ApiError");
 const cohort = require("../model/cohort.model");
 const Class = require("../model/class.model");
 const Teacher = require("../model/teacher.model");
-const Module = require("../model/module.class");
+const Module = require("../model/module.model");
 const associationModuleTeacher = require("../model/module_teacher_association.model");
 const associationCohortModule = require("../model/module_cohorte_association.model");
+const associationModuleClass = require("../model/class_module_association.model");
 
 /**-----------------------------------------------
  * @desc    get Module By query Option(class ,semester ,specialty)
- * @route   /api/v1/module?name= ,profEditor ,class= ,semester= , specialty
+ * @route   /api/v1/module?class= ,semester= , specialty
  * @method  GET
  * @access  Public
 ------------------------------------------------*/
 const getModuleAll = asyncHandler(async (req, res, next) => {
 	// get the editor id [teacher]
-	let dataClass, dataTeacher;
+	let dataTeacher, dataClass;
 	if (req.query.editor) {
 		[[dataTeacher]] = await Teacher.searchByNameOrEmail(req.query.editor);
 		if (!dataTeacher) {
@@ -27,24 +28,24 @@ const getModuleAll = asyncHandler(async (req, res, next) => {
 	if (req.query.className) {
 		// get the class id
 		[[dataClass]] = await Class.findByName(
-			req.query.className.toLocaleUpperCase()
+			req.query.className.toLocaleUpperCase(),
+			req.query.specialty
 		);
 		if (!dataClass) {
 			return next(new ApiError(`there is no class with this name `, 400));
 		}
 	}
-	const { name, semester, specialty } = req.query;
+	const { name, semester } = req.query;
 	const result = await Module.fetchAll(
 		name,
 		dataTeacher.id,
 		dataClass.id,
-		semester,
-		specialty
+		semester
 	);
 	if (!result[0][0]) {
 		return next(new ApiError(`There is no result for this request`, 400));
 	}
-	res.status(200).json({ data: result[0][0] });
+	res.status(200).json({ data: result[0] });
 });
 
 /**-----------------------------------------------
@@ -78,45 +79,72 @@ const createModule = asyncHandler(async (req, res, next) => {
 			new ApiError(`there is no teacher  with this name or Email`, 400)
 		);
 	}
-	// get the class id
-	const [[dataClass]] = await Class.findByName(
-		req.body.className.toLocaleUpperCase()
+	// get the classes id
+	let classesIds = [];
+	const classes = req.body.classes;
+	await Promise.all(
+		classes.map(async (value) => {
+			let specialty;
+			if (Array.isArray(value)) {
+				specialty = value[1];
+				value = value[0];
+			}
+			const [[dataClass]] = await Class.findByName(
+				value.toLocaleUpperCase(),
+				specialty
+			);
+			if (!dataClass) {
+				return next(
+					new ApiError(`There is no class with the name '${value}'`, 400)
+				);
+			}
+			classesIds.push(dataClass.id);
+		})
 	);
-	if (!dataClass) {
-		return next(new ApiError(`there is no class with this name `, 400));
+	const { teachers } = req.body;
+	if (!teachers.includes(dataTeacher.id)) {
+		return next(new ApiError(`The Editor Must Include In Teachers`, 400));
 	}
 	// get the body data and insert new record in database
-	const { name, semester, description, specialty } = req.body;
-	const newModule = new Module(
-		name,
-		semester,
-		description,
-		specialty,
-		dataTeacher.id,
-		dataClass.id
-	);
+	const { name, semester, description } = req.body;
+	const newModule = new Module(name, semester, description, dataTeacher.id);
 	const data = await newModule.save();
 	if (!data[0]) {
 		return next(new ApiError(`there is error in creating cohort`, 400));
 	}
 	// Handling the association now
 	// association between modules And teachers
-	// 1-Create the association cohort_module
-	const { teachers } = req.body;
-	teachers.map(async (teacherId) => {
-		const association = new associationModuleTeacher(
-			teacherId,
-			data[0].insertId
-		);
-		await association.save();
-	});
-	// get the cohorts for the specified class
-	const result = await cohort.findByClassId(dataClass.id);
-	result[0].map(async (cohortId) => {
-		const association = new associationCohortModule(
-			data[0].insertId,
-			cohortId.id
-		);
+	// 1-Implement the association module_teacher
+	await Promise.all(
+		teachers.map(async (teacherId) => {
+			const association = new associationModuleTeacher(
+				data[0].insertId,
+				teacherId
+			);
+			await association.save();
+		})
+	);
+	// 2-Implement the association module_class
+	let cohortIds = [];
+	await Promise.all(
+		classesIds.map(async (classId) => {
+			const association = new associationModuleClass(data[0].insertId, classId);
+			await association.save();
+			// get the cohorts for the specified class
+			const [result] = await Module.fetchCohortsByClassIdAndModuleId(
+				data[0].insertId,
+				classId
+			);
+			for (i = 0; i < result.length; i++) {
+				if (result[i].id !== null) {
+					cohortIds.push(result[i].id);
+				}
+			}
+		})
+	);
+	// 3-Implement the association module_cohort
+	cohortIds.map(async (cohortId) => {
+		const association = new associationCohortModule(cohortId, data[0].insertId);
 		await association.save();
 	});
 	res.status(201).json({ message: "Module Created" });
@@ -134,6 +162,7 @@ const deleteModule = asyncHandler(async (req, res, next) => {
 	// delete By Id Cohort All The Association behind this cohort cause the foreign key constraint
 	await associationCohortModule.deleteByIdModule(moduleId);
 	await associationModuleTeacher.deleteByIdModule(moduleId);
+	await associationModuleClass.deleteByIdModule(moduleId);
 	// delete cohort from cohorts table
 	await Module.deleteById(moduleId);
 	res.status(204).send();
@@ -142,11 +171,11 @@ const deleteModule = asyncHandler(async (req, res, next) => {
 /**-----------------------------------------------
  * @desc    update Module Editor
  * @route   /api/v1/cohort/:moduleId
- * @method  PATCH
+ * @method  PUT
  * @access  Admin
 ------------------------------------------------*/
 
-const updateModuleEditor = asyncHandler(async (req, res, next) => {
+const updateModule = asyncHandler(async (req, res, next) => {
 	// update the editor
 	// get the editor id [teacher]
 	const [[dataTeacher]] = await Teacher.searchByNameOrEmail(req.body.editor);
@@ -155,7 +184,43 @@ const updateModuleEditor = asyncHandler(async (req, res, next) => {
 			new ApiError(`there is no teacher  with this name or Email`, 400)
 		);
 	}
-	await Module.updateEditor(dataTeacher.id, req.params.moduleId);
+	const [[module]] = await Module.findById(req.params.moduleId);
+	if (module.id === dataTeacher.id) {
+		return next(
+			new ApiError(`This Teacher is Already Editor for this module `, 400)
+		);
+	}
+	const { name, description, semester } = req.body;
+	await Module.updateEditor(
+		name,
+		description,
+		semester,
+		dataTeacher.id,
+		req.params.moduleId
+	);
+	if (req.body.teachers) {
+		if (!req.body.teachers.includes(dataTeacher.id)) {
+			return next(new ApiError(`The Editor Must Include In Teachers`, 400));
+		}
+		// update the teacher-module association (by deleting and inserting new one)
+		await associationModuleTeacher.deleteByIdModule(req.params.moduleId);
+		// association between modules And teacher
+		await Promise.all(
+			req.body.teachers.map(async (teacherId) => {
+				const association = new associationModuleTeacher(
+					req.params.moduleId,
+					teacherId
+				);
+				await association.save();
+			})
+		);
+	}
 	res.status(200).json({ message: "Module Editor Updated" });
 });
-module.exports = { createModule, deleteModule, updateModuleEditor };
+module.exports = {
+	getModuleAll,
+	getModuleById,
+	createModule,
+	deleteModule,
+	updateModule,
+};
