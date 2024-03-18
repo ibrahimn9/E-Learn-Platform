@@ -300,7 +300,7 @@ const forgotPasswordController = asyncHandler(async (req, res, next) => {
 	}
 
 	// 4. Send reset instructions
-	const resetLink = `${process.env.CLIENT_DOMAIN}/reset-password?token=${token}`;
+	const resetLink = `${process.env.CLIENT_DOMAIN1}/reset-password?token=${token}`;
 
 	try {
 		let emailTemplate;
@@ -369,10 +369,10 @@ const resetPasswordController = asyncHandler(async (req, res, next) => {
 	if (role === "student") {
 		user = await Student.findById(rows[0].idUser);
 		data = user[0][0];
-	} else if ((role = "teacher")) {
+	} else if ((role === "teacher")) {
 		user = await Teacher.findById(rows[0].idUser);
 		data = user[0][0];
-	} else {
+	} else if(role === "admin") {
 		user = await Admin.findById(rows[0].idUser);
 		data = user[0][0];
 	}
@@ -385,7 +385,7 @@ const resetPasswordController = asyncHandler(async (req, res, next) => {
 		await Student.updatePassword(hashedPw, data.id);
 	} else if (role === "teacher") {
 		await Teacher.updatePassword(hashedPw, data.id);
-	} else if (user.role === "admin") {
+	} else if (role === "admin") {
 		await Admin.updatePassword(hashedPw, data.id);
 	}
 	await VerificationToken.deleteById(rows[0].id);
