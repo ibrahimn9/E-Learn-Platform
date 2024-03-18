@@ -69,6 +69,12 @@ class Teacher {
 			[name, name, email, email, adminCreator]
 		);
 	}
+	static removeById(id) {
+        return db.execute(
+            "DELETE FROM teachers WHERE id = ?",
+            [id]
+        );
+	}
 }
 
 module.exports = Teacher;

@@ -71,6 +71,18 @@ class Student {
 			[name, name, email, email, adminCreator]
 		);
 	}
+	static removeById(id) {
+        return db.execute(
+            "DELETE FROM students WHERE id = ?",
+            [id]
+        );
+    }
+	static removeByClassId(classId) {
+        return db.execute(
+            "DELETE FROM students WHERE idCohorte IN (SELECT id FROM cohorts WHERE idClass = ?)",
+            [classId]
+        );
+    }
 }
 
 module.exports = Student;

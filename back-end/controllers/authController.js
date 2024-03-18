@@ -70,9 +70,9 @@ const signInController = asyncHandler(async (req, res, next) => {
 		// Check if Email Was Sent Before
 		const to = await VerificationToken.findByUserIdAndRole(userData.id, role);
 		const [[rows], fields] = to;
-		const DateCreated = new Date(rows.created_at);
-		const DateExpiration = DateCreated.getTime() + 20 * 60 * 1000 - Date.now();
-		if (!rows || DateExpiration < 0) {
+		// const DateCreated = new Date(rows.created_at);
+		// const DateExpiration = DateCreated.getTime() + 20 * 60 * 1000 - Date.now();
+		if (!rows /*||  DateExpiration < 0 */ ) {
 			// 3.delete the existing token
 			if (rows) {
 				await VerificationToken.deleteById(rows.id);

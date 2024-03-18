@@ -9,11 +9,14 @@ const routerAuth = require("./route/authRoute.js");
 const cohortRoute = require("./route/cohortRoute");
 const moduleRoute = require("./route/moduleRoute");
 const classRoute = require("./route/classRoute.js");
+const adminRoute = require('./route/adminRoute.js');
 const userRoute = require("./route/userRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
+const Admin = require("./model/admin.model.js");
 const PORT = process.env.PORT;
 const app = express();
+
 
 // Serve static files from the public directory
 app.set("view engine", "ejs");
@@ -27,11 +30,19 @@ if (process.env.NODE_ENV === "development") {
 	console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
+// app.use('/',async(req,res,next)=>{
+//     const admin = new Admin("kadriayyoub","kadriayoub122@gmail.com","ayoub2003");
+// 	await admin.save();
+// 	return res.json("created")
+// })
+
+
 app.use("/api/v1/auth", routerAuth);
 app.use("/api/v1/cohort", cohortRoute);
 app.use("/api/v1/module", moduleRoute);
 app.use("/api/v1/class", classRoute);
 app.use("/api/v1/users", userRoute);
+app.use('/api/v1/admin',adminRoute);
 
 // For Unmounted Url
 app.all("*", (req, res, next) => {
