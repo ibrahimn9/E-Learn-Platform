@@ -11,7 +11,7 @@ const associationCohortTeacher = require("../model/cohorte_teacher_association.m
  * @access  Admin
 ------------------------------------------------*/
 const getCohortAll = asyncHandler(async (req, res, next) => {
-	let dataClass;
+	let dataClass = { id: null };
 	let { specialty, className } = req.query;
 	// get the classId
 	if (className) {
@@ -21,8 +21,12 @@ const getCohortAll = asyncHandler(async (req, res, next) => {
 		}
 	}
 	let { groupNumber } = req.query;
-	const result = await cohort.fetchAll(dataClass.id, groupNumber, req.user.id);
-	res.status(200).json({ data: result[0] });
+	const [result] = await cohort.fetchAll(
+		dataClass.id,
+		groupNumber,
+		req.user.id
+	);
+	res.status(200).json({ data: result });
 });
 
 /**-----------------------------------------------
@@ -60,9 +64,10 @@ const createCohort = asyncHandler(async (req, res, next) => {
 	// get the data from body
 	const { groupNumber } = req.body;
 	// insert new Cohort
+	let data;
 	const newCohort = new cohort(groupNumber, dataClass.id, req.user.id);
 	try {
-		const data = await newCohort.save();
+		data = await newCohort.save();
 	} catch (err) {
 		if (err.code === "ER_DUP_ENTRY") {
 			// Handle duplicate entry error
@@ -87,7 +92,6 @@ const createCohort = asyncHandler(async (req, res, next) => {
 	});
 	// create the association module_cohort
 	const [modules] = await cohort.fetchModulesWithinClass(dataClass.id);
-	console.log(modules);
 
 	res.status(201).json({ message: "Cohort Created" });
 });
@@ -102,9 +106,13 @@ const createCohort = asyncHandler(async (req, res, next) => {
 const deleteCohort = asyncHandler(async (req, res, next) => {
 	const { cohortId } = req.params;
 	// delete By Id Cohort All The Association behind this cohort cause the foreign key constraint
-	await associationCohortTeacher.deleteByIdCohort(cohortId);
-	// delete cohort from cohorts table
-	await cohort.deleteById(cohortId);
+	try {
+		await associationCohortTeacher.deleteByIdCohort(cohortId);
+		// delete cohort from cohorts table
+		await cohort.deleteById(cohortId);
+	} catch (error) {
+		return next(new ApiError(error.message, 400));
+	}
 	res.status(204).send();
 });
 

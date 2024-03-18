@@ -42,9 +42,6 @@ const getModuleAll = asyncHandler(async (req, res, next) => {
 		dataClass.id,
 		semester
 	);
-	if (!result[0][0]) {
-		return next(new ApiError(`There is no result for this request`, 400));
-	}
 	res.status(200).json({ data: result[0] });
 });
 
@@ -178,37 +175,40 @@ const deleteModule = asyncHandler(async (req, res, next) => {
 const updateModule = asyncHandler(async (req, res, next) => {
 	// update the editor
 	// get the editor id [teacher]
-	const [[dataTeacher]] = await Teacher.searchByNameOrEmail(req.body.editor);
-	if (!dataTeacher) {
-		return next(
-			new ApiError(`there is no teacher  with this name or Email`, 400)
-		);
-	}
-	const [[module]] = await Module.findById(req.params.moduleId);
-	if (module.idEditor === dataTeacher.id) {
-		return next(
-			new ApiError(`This Teacher is Already Editor for this module `, 400)
-		);
-	}
-	try {
-		const association = new associationModuleTeacher(
-			req.params.moduleId,
-			dataTeacher.id
-		);
-		await association.save();
-	} catch (err) {
-		if (err.code === "ER_DUP_ENTRY") {
-			await associationModuleTeacher.deleteByIdModuleAndTeacherId(
-				req.params.moduleId,
-				dataTeacher.id
+	let dataTeacher = { id: null };
+	if (req.body.editor) {
+		[[dataTeacher]] = await Teacher.searchByNameOrEmail(req.body.editor);
+		if (!dataTeacher) {
+			return next(
+				new ApiError(`there is no teacher  with this name or Email`, 400)
 			);
+		}
+		const [[module]] = await Module.findById(req.params.moduleId);
+		if (module.idEditor === dataTeacher.id) {
+			return next(
+				new ApiError(`This Teacher is Already Editor for this module `, 400)
+			);
+		}
+		try {
 			const association = new associationModuleTeacher(
 				req.params.moduleId,
 				dataTeacher.id
 			);
 			await association.save();
-		} else {
-			throw new Error("Database error: Failed to insert the record.");
+		} catch (err) {
+			if (err.code === "ER_DUP_ENTRY") {
+				await associationModuleTeacher.deleteByIdModuleAndTeacherId(
+					req.params.moduleId,
+					dataTeacher.id
+				);
+				const association = new associationModuleTeacher(
+					req.params.moduleId,
+					dataTeacher.id
+				);
+				await association.save();
+			} else {
+				throw new Error("Database error: Failed to insert the record.");
+			}
 		}
 	}
 	if (req.body.teachers) {
@@ -251,7 +251,7 @@ const updateModule = asyncHandler(async (req, res, next) => {
 		req.params.moduleId
 	);
 
-	res.status(200).json({ message: "Module Updated", data });
+	res.status(200).json({ message: "Module Updated" });
 });
 module.exports = {
 	getModuleAll,

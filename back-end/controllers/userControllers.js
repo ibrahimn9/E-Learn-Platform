@@ -26,19 +26,23 @@ const getUserAll = asyncHandler(async (req, res, next) => {
 			email,
 			req.user.id
 		);
+		usersStudent.map((value) => {
+			value["role"] = "student";
+		});
 		const [usersTeacher] = await Teacher.findByNameOrEmail(
 			name,
 			email,
 			req.user.id
-    );
-    users = [...usersStudent, ...usersTeacher]
-    console.log(users)
+		);
+		usersTeacher.map((value) => {
+			value["role"] = "teacher	";
+		});
+		users = [...usersStudent, ...usersTeacher];
 	}
-
-	if (!users)
+	if (![users][0].length)
 		return next(new ApiError(`No User Found With This Email Or name`, 400));
 
-	res.status(200).json({ data: users, role });
+	res.status(200).json({ data: users });
 });
 
 /**-----------------------------------------------

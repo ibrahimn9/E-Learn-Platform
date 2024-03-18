@@ -31,7 +31,7 @@ const getClassById = asyncHandler(async (req, res, next) => {
 
 const getClassAll = asyncHandler(async (req, res, next) => {
 	const { className, specialty } = req.query;
-	const [[data]] = await Class.findByName(className, specialty);
+	const [data] = await Class.findByName(className, specialty);
 	res.status(200).json({ data });
 });
 

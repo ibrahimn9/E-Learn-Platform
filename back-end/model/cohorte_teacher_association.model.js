@@ -8,7 +8,7 @@ class CohorteTeacherAssociation {
 	}
 	save() {
 		return db.execute(
-			`INSERT INTO cohorte_teacher_association (idTeacher,idCohort) VALUES (?,?) `,
+			`INSERT INTO cohorte_teacher_association (idTeacher,idCohorte) VALUES (?,?) `,
 			[this.idTeacher, this.idCohorte]
 		);
 	}
@@ -17,7 +17,7 @@ class CohorteTeacherAssociation {
 	}
 	static deleteByIdCohort(id) {
 		return db.execute(
-			"DELETE FROM cohorte_teacher_association WHERE idCohort = ?",
+			"DELETE FROM cohorte_teacher_association WHERE idCohorte = ?",
 			[id]
 		);
 	}

@@ -25,13 +25,13 @@ class Cohort {
 		// Check if groupeNumber is null or undefined, and set it to NULL if it is
 		groupeNumber = groupeNumber || null;
 		return db.execute(
-			"SELECT * FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE (cohorts.idClass = ? OR ? IS NULL) AND (cohorts.groupeNumber = ? OR ? IS NULL ) AND (cohorts.adminCreator = ? )",
+			"SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.specialty FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE (cohorts.idClass = ? OR ? IS NULL) AND (cohorts.groupeNumber = ? OR ? IS NULL ) AND (cohorts.adminCreator = ? )",
 			[idClass, idClass, groupeNumber, groupeNumber, adminCreator]
 		);
 	}
 	static fetchModulesWithinClass(idClass) {
 		return db.execute(
-			"SELECT idModule FROM cohort LEFT JOIN class_module_association ON cohorts.idClass = class_module_association.idClass WHERE cohorts.idClass = ?",
+			"SELECT idModule FROM cohorts LEFT JOIN class_module_association ON cohorts.idClass = class_module_association.idClass WHERE cohorts.idClass = ?",
 			[idClass]
 		);
 	}
@@ -43,11 +43,10 @@ class Cohort {
 	}
 	static async getCohortIdByClassAndGroupNumber(idClass, groupeNumber) {
 		return await db.execute(
-			"SELECT id FROM cohortes WHERE idClass = ? AND groupeNumber = ?",
+			"SELECT id FROM cohorts WHERE idClass = ? AND groupeNumber = ?",
 			[idClass, groupeNumber]
 		);
 	}
-
 }
 
 module.exports = Cohort;
