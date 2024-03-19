@@ -1,7 +1,7 @@
 const express = require("express");
-const {uploadStudents, uploadTeachers,removeStudentById,removeStudentsByClassId,removeTeacherById} =require('../controllers/adminController');
+const {uploadStudents, uploadTeachers,removeStudentById,removeStudentsByClassId,removeTeacherById,uploadStudent,uploadTeacher} =require('../controllers/adminController');
 const {upload} =require('../middlewares/multer');
-const {uploadValidator} = require('../utils/validator/fileValidator');
+const {uploadValidator,uploadStudentValidator,uploadTeacherValidator} = require('../utils/validator/userValidator');
 const router = express.Router();
 
 const authServices = require("../controllers/authController");
@@ -17,5 +17,9 @@ router.delete('/delete-student/:id',removeStudentById);
 router.delete('/delete-teacher/:id',removeTeacherById);
 // /api/v1/admin/delete-students/:id
 router.delete('/delete-students/:id',removeStudentsByClassId);
+// /api/v1/admin/insert-new-student
+router.post('/insert-new-student',uploadStudentValidator,uploadStudent);
+///api/v1/admin/insert-new-teacher
+router.post('/insert-new-teacher',uploadTeacherValidator,uploadTeacher);
 
 module.exports = router;
