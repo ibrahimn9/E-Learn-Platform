@@ -30,11 +30,7 @@ if (process.env.NODE_ENV === "development") {
 	console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-// app.use('/',async(req,res,next)=>{
-//     const admin = new Admin("kadriayyoub","kadriayoub122@gmail.com","ayoub2003");
-// 	await admin.save();
-// 	return res.json("created")
-// })
+
 
 
 app.use("/api/v1/auth", routerAuth);
