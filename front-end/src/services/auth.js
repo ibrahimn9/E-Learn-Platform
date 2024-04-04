@@ -19,9 +19,15 @@ const resetPassword = async(token, body) => {
     return await axios.post(`${baseUrl}/reset-password/${token}`, body);
 }
 
+
+const verifyToken = async(body) => {
+    return await axios.post(`${baseUrl}/verifytoken`, body);
+}
+
 export default {
     signIn,
     resendEmail,
     forgetPassword,
     resetPassword,
+    verifyToken
 }

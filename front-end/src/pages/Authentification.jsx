@@ -6,6 +6,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import auth from "../services/auth";
 import { useStateContext } from "../context/StateContext";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Authentification = () => {
   const defaultOptions = {
@@ -37,6 +38,7 @@ const Authentification = () => {
         if (response.data.message === "Email Verification Was sent To user")
           setCurrPage("emailsent");
         else {
+          Cookies.set("access_token", response.data.token, { expires: 7 });
           navigate(`/${response.data.role}/${response.data.userData.id}`);
           setUserData(response.data);
         }
@@ -79,10 +81,10 @@ const Authentification = () => {
         <img src={images.logo} alt="logo" width={"120px"} />
         {errorMsg && (
           <div
-            class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-10 w-[80%]"
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-10 w-[80%]"
             role="alert"
           >
-            <span class="block sm:inline text-sm">{errorMsg}</span>
+            <span className="block sm:inline text-sm">{errorMsg}</span>
           </div>
         )}
 
@@ -131,10 +133,10 @@ const Authentification = () => {
       <div className="h-auto w-[95%] md:w-[70%] lg:w-[42%] flex flex-col items-center mt-[-100px]">
         {errorMsg && (
           <div
-            class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-10 w-[80%]"
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-10 w-[80%]"
             role="alert"
           >
-            <span class="block sm:inline text-sm">{errorMsg}</span>
+            <span className="block sm:inline text-sm">{errorMsg}</span>
           </div>
         )}
         <div className="max-w-[180px]">
@@ -195,10 +197,10 @@ const Authentification = () => {
         </p>
         {errorMsg && (
           <div
-            class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-10 w-[80%]"
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-10 w-[80%]"
             role="alert"
           >
-            <span class="block sm:inline text-sm">{errorMsg}</span>
+            <span className="block sm:inline text-sm">{errorMsg}</span>
           </div>
         )}
         <form

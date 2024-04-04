@@ -1,8 +1,9 @@
 const csv = require("csv-parser");
 const fs = require("fs");
-const Student = require('../model/student.model');
-const Teacher = require('../model/teacher.model');
-const Cohorte = require('../model/cohort.model');
+const bcrypt = require("bcrypt")
+const Student = require("../model/student.model");
+const Teacher = require("../model/teacher.model");
+const Cohorte = require("../model/cohort.model");
 const ApiError = require("../utils/ApiError.js");
 const asyncHandler = require("express-async-handler");
 
@@ -12,49 +13,51 @@ const asyncHandler = require("express-async-handler");
  * @method  POST
  * @access  Admin
 ------------------------------------------------*/
-const uploadStudents = asyncHandler(async (req,res,next) =>{
-    try {
-        if (!req.file) {
-          return next(new ApiError("No file uploaded",400));
-        }
-    
-        const results = [];
-    
-        // Read the uploaded CSV file
-        fs.createReadStream(req.file.path)
-          .pipe(csv())
-          .on("data", (data) => results.push(data))
-          .on("end", async () => {
-            // Iterate over each row in the CSV file
-            for (const studentData of results) {
-                const [rows, fields] = await Cohorte.getCohortIdByClassAndGroupNumber(studentData.idClass,studentData.groupeNumber)
-              try {
-                // Create a new Student object using data from CSV
-                const student = new Student(
-                  studentData.fullName,
-                  studentData.email,
-                  studentData.password,
-                  req.user.id,
-                  rows[0].id
-                );
-                // Save the student to the database
-                await student.save();
-              } catch (error) {
-                return next(new ApiError("Error saving student:",error));
-                // Handle error appropriately (skip or stop processing)
-              }
-            }
-    
-            // Delete the uploaded file after processing
-            fs.unlinkSync(req.file.path);
-            res.status(200).json({ message: "Students inserted successfully" });
-          });
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        return next(new ApiError('Internal server error',500));
-      }
-})
+const uploadStudents = asyncHandler(async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return next(new ApiError("No file uploaded", 400));
+    }
 
+    const results = [];
+
+    // Read the uploaded CSV file
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        // Iterate over each row in the CSV file
+        for (const studentData of results) {
+          const [rows, fields] = await Cohorte.getCohortIdByClassAndGroupNumber(
+            studentData.idClass,
+            studentData.groupeNumber
+          );
+          try {
+            // Create a new Student object using data from CSV
+            const student = new Student(
+              studentData.fullName,
+              studentData.email,
+              studentData.password,
+              req.user.id,
+              rows[0].id
+            );
+            // Save the student to the database
+            await student.save();
+          } catch (error) {
+            return next(new ApiError("Error saving student:", error));
+            // Handle error appropriately (skip or stop processing)
+          }
+        }
+
+        // Delete the uploaded file after processing
+        fs.unlinkSync(req.file.path);
+        res.status(200).json({ message: "Students inserted successfully" });
+      });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    return next(new ApiError("Internal server error", 500));
+  }
+});
 
 /**-----------------------------------------------
  * @desc    insert new teachers
@@ -62,18 +65,18 @@ const uploadStudents = asyncHandler(async (req,res,next) =>{
  * @method  POST
  * @access  Admin
 ------------------------------------------------*/
-const uploadTeachers = asyncHandler(async (req,res,next) =>{
+const uploadTeachers = asyncHandler(async (req, res, next) => {
   try {
     if (!req.file) {
-      return next(new ApiError("No file uploaded",400));
+      return next(new ApiError("No file uploaded", 400));
     }
     const teachers = [];
     fs.createReadStream(req.file.path)
       .pipe(csv())
       .on("data", async (row) => {
-        const { fullName, email, password} = row;
+        const { fullName, email, password } = row;
         // Assuming adminCreator is provided in the CSV file
-        const teacher = new Teacher(fullName, email, password,req.user.id);
+        const teacher = new Teacher(fullName, email, password, req.user.id);
         teachers.push(teacher);
       })
       .on("end", async () => {
@@ -84,9 +87,9 @@ const uploadTeachers = asyncHandler(async (req,res,next) =>{
       });
   } catch (err) {
     console.error("Error inserting teachers:", err);
-    return next( "Internal Server Error",500)
+    return next("Internal Server Error", 500);
   }
-})
+});
 
 /**-----------------------------------------------
  * @desc    delete student by id
@@ -94,25 +97,25 @@ const uploadTeachers = asyncHandler(async (req,res,next) =>{
  * @method  DELETE
  * @access  Admin
 ------------------------------------------------*/
-const removeStudentById = asyncHandler(async (req, res,next) => {
+const removeStudentById = asyncHandler(async (req, res, next) => {
   const studentId = req.params.id; // Assuming the ID is passed in the request parameters
 
   try {
-      // Call the static method to remove the student
-      const [result] = await Student.removeById(studentId);
+    // Call the static method to remove the student
+    const [result] = await Student.removeById(studentId);
 
-      // Check if any rows were affected by the deletion
-      if (result.affectedRows > 0) {
-          // Student successfully removed
-          return res.status(200).json({ message: 'Student removed successfully' });
-      } else {
-          // No student found with the given ID
-          return next(new ApiError('Student not found',404));
-      }
+    // Check if any rows were affected by the deletion
+    if (result.affectedRows > 0) {
+      // Student successfully removed
+      return res.status(200).json({ message: "Student removed successfully" });
+    } else {
+      // No student found with the given ID
+      return next(new ApiError("Student not found", 404));
+    }
   } catch (error) {
-      // Handle any errors that occur during the deletion process
-      console.error('Error removing student:', error);
-      return next(new ApiError('An internal server error occurred',500))
+    // Handle any errors that occur during the deletion process
+    console.error("Error removing student:", error);
+    return next(new ApiError("An internal server error occurred", 500));
   }
 });
 
@@ -122,25 +125,25 @@ const removeStudentById = asyncHandler(async (req, res,next) => {
  * @method  DELETE
  * @access  Admin
 ------------------------------------------------*/
-const removeTeacherById = asyncHandler(async (req, res,next) => {
+const removeTeacherById = asyncHandler(async (req, res, next) => {
   const teacherId = req.params.id; // Assuming the ID is passed in the request parameters
 
   try {
-      // Call the static method to remove the student
-      const [result] = await Teacher.removeById(teacherId);
+    // Call the static method to remove the student
+    const [result] = await Teacher.removeById(teacherId);
 
-      // Check if any rows were affected by the deletion
-      if (result.affectedRows > 0) {
-          // Student successfully removed
-          return res.status(200).json({ message: 'Student removed successfully' });
-      } else {
-          // No student found with the given ID
-          return next(new ApiError('Student not found',404));
-      }
+    // Check if any rows were affected by the deletion
+    if (result.affectedRows > 0) {
+      // Student successfully removed
+      return res.status(200).json({ message: "Teacher removed successfully" });
+    } else {
+      // No student found with the given ID
+      return next(new ApiError("Student not found", 404));
+    }
   } catch (error) {
-      // Handle any errors that occur during the deletion process
-      console.error('Error removing student:', error);
-      return next(new ApiError('An internal server error occurred',500))
+    // Handle any errors that occur during the deletion process
+    console.error("Error removing student:", error);
+    return next(new ApiError("An internal server error occurred", 500));
   }
 });
 
@@ -154,21 +157,23 @@ const removeStudentsByClassId = asyncHandler(async (req, res, next) => {
   const classId = req.params.id; // Assuming the class ID is passed in the request parameters
 
   try {
-      // Call the static method to remove students by classId
-      const [result] = await Student.removeByClassId(classId);
+    // Call the static method to remove students by classId
+    const [result] = await Student.removeByClassId(classId);
 
-      // Check if any rows were affected by the deletion
-      if (result.affectedRows > 0) {
-          // Students successfully removed
-          return res.status(200).json({ message: 'Students removed successfully' });
-      } else {
-          // No students found for the given class ID
-          return next(new ApiError('No students found for the given class ID', 404));
-      }
+    // Check if any rows were affected by the deletion
+    if (result.affectedRows > 0) {
+      // Students successfully removed
+      return res.status(200).json({ message: "Students removed successfully" });
+    } else {
+      // No students found for the given class ID
+      return next(
+        new ApiError("No students found for the given class ID", 404)
+      );
+    }
   } catch (error) {
-      // Handle any errors that occur during the deletion process
-      console.error('Error removing students by class ID:', error);
-      return next(new ApiError('An internal server error occurred', 500));
+    // Handle any errors that occur during the deletion process
+    console.error("Error removing students by class ID:", error);
+    return next(new ApiError("An internal server error occurred", 500));
   }
 });
 
@@ -180,44 +185,52 @@ const removeStudentsByClassId = asyncHandler(async (req, res, next) => {
 ------------------------------------------------*/
 const uploadStudent = asyncHandler(async (req, res, next) => {
   try {
-      // Check if data is provided in the request body
-      if (!req.body) {
-          return next(new ApiError("No student data provided", 400));
-      }
+    // Check if data is provided in the request body
+    if (!req.body) {
+      return next(new ApiError("No student data provided", 400));
+    }
 
-      // Extract student data from the request body
-      const { fullName, email, password, idClass, groupeNumber } = req.body;
+    // Extract student data from the request body
+    const { fullName, email, password, idClass, groupeNumber } = req.body;
 
-      // Check if all required fields are provided
-      if (!fullName || !email || !password || !idClass || !groupeNumber) {
-          return next(new ApiError("Missing required fields", 400));
-      }
+    // Check if all required fields are provided
+    if (!fullName || !email || !password || !idClass || !groupeNumber) {
+      return next(new ApiError("Missing required fields", 400));
+    }
 
-      // Get cohort ID by class and group number
-      const [rows, fields] = await Cohorte.getCohortIdByClassAndGroupNumber(idClass, groupeNumber);
+    // Get cohort ID by class and group number
+    const [rows, fields] = await Cohorte.getCohortIdByClassAndGroupNumber(
+      idClass,
+      groupeNumber
+    );
 
-      // Check if cohort ID is found
-      if (!rows || !rows.length) {
-          return next(new ApiError("Cohort not found for the given class and group number", 404));
-      }
-
-      // Create a new Student object
-      const student = new Student(
-          fullName,
-          email,
-          password,
-          req.user.id, // Assuming req.user.id contains the admin user's ID
-          rows[0].id // Using the first row's cohort ID
+    // Check if cohort ID is found
+    if (!rows || !rows.length) {
+      return next(
+        new ApiError(
+          "Cohort not found for the given class and group number",
+          404
+        )
       );
+    }
 
-      // Save the student to the database
-      await student.save();
+    // Create a new Student object
+    const student = new Student(
+      fullName,
+      email,
+      password,
+      req.user.id, // Assuming req.user.id contains the admin user's ID
+      rows[0].id // Using the first row's cohort ID
+    );
 
-      // Send success response
-      res.status(200).json({ message: "Student inserted successfully" });
+    // Save the student to the database
+    await student.save();
+
+    // Send success response
+    res.status(200).json({ message: "Student inserted successfully" });
   } catch (error) {
-      console.error("Error inserting student:", error);
-      return next(new ApiError("Internal server error", 500));
+    console.error("Error inserting student:", error);
+    return next(new ApiError("Internal server error", 500));
   }
 });
 /**-----------------------------------------------
@@ -227,6 +240,7 @@ const uploadStudent = asyncHandler(async (req, res, next) => {
  * @access  Admin
 ------------------------------------------------*/
 const uploadTeacher = asyncHandler(async (req, res, next) => {
+  console.log("hi");
   try {
     // Check if data is provided in the request body
     if (!req.body) {
@@ -239,6 +253,12 @@ const uploadTeacher = asyncHandler(async (req, res, next) => {
     // Check if all required fields are provided
     if (!fullName || !email || !password) {
       return next(new ApiError("Missing required fields", 400));
+    }
+
+    const data = await Teacher.findByEmail(email);
+    const exist = await data[0][0];
+    if (exist) {
+      return next(new ApiError("Teacher already exists", 401));
     }
 
     // Create a new Teacher object
@@ -258,8 +278,53 @@ const uploadTeacher = asyncHandler(async (req, res, next) => {
     console.error("Error inserting teacher:", err);
     return next("Internal Server Error", 500);
   }
-});
+}); 
 
+const getTeacherWithModules = asyncHandler( async (req,res,next) => {
+  const teacherId = req.query.id;
+  if(!teacherId){
+    return next(new ApiError("id not found", 400));
+  }
+  const data = await Teacher.getTeacherWithModules(teacherId);
+  if(!data){
+    return next(new ApiError("teacher id not found", 401));
+  }
+  const modules = data[0];
+  return res.status(200).json({modules});
+})
+
+const updateStudent = asyncHandler(async (req, res, next) => {
+  const { id } = req.params; // Assuming you're passing the student ID in the URL params
+  const { fullName, email, groupeNumber } = req.body;
+
+  try {
+      // Fetch the existing student data
+      const data = await Student.findById(id);
+      const studentData = await data[0][0];
+      if(!studentData){
+        return res.status(401).json({ error: "student not founded" });
+      }
+      let idcohorte;
+      if(groupeNumber){
+        const grNbr = parseInt(groupeNumber)
+        const datta = await Cohorte.findByGroupeNumber(grNbr);
+        idcohorte = await datta[0][0].id;
+      }
+      // Preserve old data if fields are not provided
+      const updatedFullName = fullName || studentData.fullName;
+      const updatedEmail = email || studentData.email;
+      const updatedIdCohorte = idcohorte || studentData.idCohorte;
+
+
+      // Update the student
+      await Student.updateStudentDetails(updatedFullName, updatedEmail, updatedIdCohorte, id);
+
+      res.status(200).json({ message: "Student updated successfully" });
+  } catch (error) {
+      console.error("Error updating student:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+})
 
 
 module.exports ={
@@ -269,5 +334,7 @@ module.exports ={
     removeTeacherById,
     removeStudentsByClassId,
     uploadStudent,
-    uploadTeacher
+    uploadTeacher,
+    getTeacherWithModules,
+    updateStudent
 }

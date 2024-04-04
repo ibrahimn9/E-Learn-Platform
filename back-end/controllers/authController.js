@@ -61,11 +61,10 @@ const signInController = asyncHandler(async (req, res, next) => {
 		const token = createToken([userData.id, role], process.env.JWT_SECRET_KEY);
 		res
 			.cookie("access_token", token, {
-				httpOnly: true,
 				secure: process.env.NODE_ENV === "production",
 			})
 			.status(200)
-			.json({ message: "Logged in successfully", userData, role });
+			.json({ message: "Logged in successfully", userData, role, token });
 	} else {
 		// Check if Email Was Sent Before
 		const to = await VerificationToken.findByUserIdAndRole(userData.id, role);
@@ -167,7 +166,6 @@ const verifyUserAccountCtrl = asyncHandler(async (req, res, next) => {
 	const token = createToken([userData.id, role], process.env.JWT_SECRET_KEY);
 	res
 		.cookie("access_token", token, {
-			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 		})
 		.status(200)
@@ -466,7 +464,53 @@ const resendEmail = asyncHandler(async (req, res, next) => {
 	res.status(200).json({ message: `Email Verification Was sent To user` });
 });
 
-module.exports = {
+const verifytoken = asyncHandler(async (req, res, next) => {
+	// 1) check if token exist
+	const {token} = req.body;
+  
+	if (!token)
+	  return next(
+		new ApiError(
+		  "You are not log in , Please log in to access to this route ",
+		  400
+		)
+	  );
+  
+	// 2) verify the token (no changes happen , expired token ) :: if change happen in the payload or the token is expired
+	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+	if(! decoded){
+	  return next(
+		new ApiError(
+		  "invalid token",
+		  401
+		)
+	  );
+	}
+  
+	// 3) verify if the user exist in database (this step is important when user is deleted by admin he also has the ability to access route because have the token )
+	const role = decoded.role;
+	if (role === "student") {
+	  // Searching in the students table
+	  user = await Student.findById(decoded.userId);
+	} else if (role === "teacher") {
+	  // Searching in the teachers table
+	  user = await Teacher.findById(decoded.userId);
+	} else {
+	  // Searching in the admins table
+	  user = await Admin.findById(decoded.userId);
+	}
+	if (!user) {
+	  return next(
+		new ApiError(
+		  "The user that belong to this token has no longer exist ",
+		  400
+		)
+	  );
+	}
+	return res.status(200).json({userData: user[0][0], role})
+  });
+  
+  module.exports = {
 	signInController,
 	verifyUserAccountCtrl,
 	logoutController,
@@ -475,4 +519,5 @@ module.exports = {
 	resendEmail,
 	allowedTo,
 	protect,
-};
+	verifytoken,
+  };

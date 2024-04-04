@@ -12,10 +12,18 @@ body {
   list-style: none;
 }
 
+
+
 .auth-bg {
   background-image: url(./assets/ellipse.svg);
   background-repeat: no-repeat;
   position: relative;
 }
 
-
+tr {
+  border-bottom: 1px solid #D5D5D5;
+  border-top: 1px solid #D5D5D5;
+  border-collapse: collapse;
+  text-align: center;
+  color: #202224;
+}

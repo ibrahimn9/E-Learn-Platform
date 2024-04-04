@@ -1,18 +1,19 @@
 const express = require("express");
 const {
-	signInController,
-	verifyUserAccountCtrl,
-	logoutController,
-	forgotPasswordController,
-	resetPasswordController,
-	resendEmail,
+  signInController,
+  verifyUserAccountCtrl,
+  logoutController,
+  forgotPasswordController,
+  resetPasswordController,
+  resendEmail,
+  verifytoken
 } = require("../controllers/authController.js");
 const { signInValidator } = require("../utils/validator/authValidator.js");
 const {
-	forgetPasswordValidator,
+  forgetPasswordValidator,
 } = require("../utils/validator/forgetPasswordValidator.js");
 const {
-	resetPasswordValidator,
+  resetPasswordValidator,
 } = require("../utils/validator/resetPasswordValidator.js");
 const router = express.Router();
 
@@ -23,15 +24,17 @@ router.get("/:userId/verify/:token", verifyUserAccountCtrl);
 router.post("/resend-Email", forgetPasswordValidator, resendEmail);
 
 router.post(
-	"/forgot-password",
-	forgetPasswordValidator,
-	forgotPasswordController
+  "/forgot-password",
+  forgetPasswordValidator,
+  forgotPasswordController
 );
 
+router.post('/verifytoken',verifytoken);
+
 router.post(
-	"/reset-password/:token",
-	resetPasswordValidator,
-	resetPasswordController
+  "/reset-password/:token",
+  resetPasswordValidator,
+  resetPasswordController
 );
 
 router.post("/logOut", logoutController);
