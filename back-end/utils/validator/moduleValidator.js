@@ -9,15 +9,22 @@ exports.createModuleValidator = [
 		.withMessage("should Be A class for Module")
 		.isArray()
 		.withMessage("classes except to be Array"),
+
 	check("teachers")
 		.notEmpty()
 		.withMessage("Should be Teachers For this Module")
 		.isArray()
-		.withMessage("teachers Should be array"),
+		.withMessage("teachers Should be array")
+		.custom((value) => {
+			if (value.length === 0) {
+				throw new Error("Empty Array Are Not Allowed");
+			}
+			return true;
+		}),
 	check("semester")
 		.notEmpty()
 		.withMessage("Should be a semester")
-		.isIn(["S1", "S2"])
+		.isIn(["S1", "S2", "s1", "s2"])
 		.withMessage("Invalid semester"),
 	validatorMiddleware,
 ];

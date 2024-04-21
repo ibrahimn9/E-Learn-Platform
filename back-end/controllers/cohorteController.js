@@ -106,13 +106,13 @@ const createCohort = asyncHandler(async (req, res, next) => {
 const deleteCohort = asyncHandler(async (req, res, next) => {
 	const { cohortId } = req.params;
 	// delete By Id Cohort All The Association behind this cohort cause the foreign key constraint
-	try {
-		await associationCohortTeacher.deleteByIdCohort(cohortId);
-		// delete cohort from cohorts table
-		await cohort.deleteById(cohortId);
-	} catch (error) {
-		return next(new ApiError(error.message, 400));
+	const [[document]] = await cohort.findWithId(cohortId);
+	if (!document) {
+		return next(new ApiError(`No cohort for this id ${cohortId}`, 404));
 	}
+	
+		await cohort.deleteById(cohortId);
+
 	res.status(204).send();
 });
 
