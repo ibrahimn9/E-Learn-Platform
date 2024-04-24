@@ -329,25 +329,17 @@ const CreateCohort = () => {
             </div>
             <div className="flex items-center justify-between">
               <button
-              onClick={handleCreateCohort}
+                onClick={handleCreateCohort}
                 disabled={
                   hasSpecialty(className, classes)
-                    ? className === "" ||
-                      specialty === "" ||
-                      teachers.length === 0 ||
-                      groupNumber === ""
+                    ? className === "" || specialty === "" || groupNumber === ""
                     : className === "" ||
-                      teachers.length === 0 ||
                       groupNumber === ""
                 }
                 className={`px-4 py-2 ${
                   hasSpecialty(className, classes)
-                    ? className === "" ||
-                      specialty === "" ||
-                      teachers.length === 0 ||
-                      groupNumber === ""
+                    ? className === "" || specialty === "" || groupNumber === ""
                     : className === "" ||
-                      teachers.length === 0 ||
                       groupNumber === ""
                     ? "opacity-50"
                     : "opacity-100"
