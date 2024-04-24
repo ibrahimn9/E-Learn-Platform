@@ -5,6 +5,7 @@ const {
 	deleteCohort,
 	getCohortAll,
 	getCohortById,
+	editCohort,
 } = require("../controllers/cohorteController");
 
 const { createCohortValidator } = require("../utils/validator/cohortValidator");
@@ -13,6 +14,7 @@ const authServices = require("../controllers/authController");
 // This route is Authorized For Admin
 router.use(authServices.protect, authServices.allowedTo("admin"));
 router.route("/").post(createCohortValidator, createCohort).get(getCohortAll);
-router.route("/:cohortId").get(getCohortById).delete(deleteCohort) ;
+router.route("/:cohortId").get(getCohortById).delete(deleteCohort).put(editCohort);
+
 
 module.exports = router;

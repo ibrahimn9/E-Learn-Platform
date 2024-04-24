@@ -12,9 +12,12 @@ class Cohort {
       [this.groupeNumber, this.idClass, this.adminCreator]
     );
   }
+  static findWithId(id) {
+    return db.execute("SELECT * FROM cohorts WHERE id = ?", [id]);
+  }
   static findById(id, idAdmin) {
     return db.execute(
-      "SELECT * FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE cohorts.id = ? AND cohorts.adminCreator = ? ",
+      "SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.specialty FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE cohorts.id = ? AND cohorts.adminCreator = ? ",
       [id, idAdmin]
     );
   }
@@ -34,6 +37,12 @@ class Cohort {
       [idClass, idClass, groupeNumber, groupeNumber, adminCreator]
     );
   }
+  static getTeachersFromCohortId(idCohort) {
+    return db.execute(
+      "SELECT idTeacher FROM  cohorte_teacher_association WHERE (cohorte_teacher_association.idCohorte = ?)",
+      [idCohort]
+    );
+  }
   static fetchModulesWithinClass(idClass) {
     return db.execute(
       "SELECT idModule FROM cohorts LEFT JOIN class_module_association ON cohorts.idClass = class_module_association.idClass WHERE cohorts.idClass = ?",
@@ -50,6 +59,12 @@ class Cohort {
     return await db.execute(
       "SELECT id FROM cohorts WHERE idClass = ? AND groupeNumber = ?",
       [idClass, groupeNumber]
+    );
+  }
+  static async updateGroupNumber(cohortId, newGroupNumber) {
+    return await db.execute(
+      "UPDATE cohorts SET groupeNumber = ? WHERE id = ?",
+      [newGroupNumber, cohortId]
     );
   }
 }
