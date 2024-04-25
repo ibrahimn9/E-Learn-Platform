@@ -26,6 +26,19 @@ const getCohortAll = asyncHandler(async (req, res, next) => {
 		groupNumber,
 		req.user.id
 	);
+	// Assuming result is an array of items you want to process asynchronously
+	const updatedResult = await Promise.all(
+		result.map(async (item) => {
+			const [teachers] = await cohort.getTeachersFromCohortId(item.id);
+			if (teachers.length > 0) {
+				const ids = teachers.map((teacher) => teacher.idTeacher);
+				item.teachers = ids;
+			} else {
+				item.teachers = []; // Handle case where no teachers are found
+			}
+			return item; // Return the updated item
+		})
+	);
 	res.status(200).json({ data: result });
 });
 
@@ -38,11 +51,18 @@ const getCohortAll = asyncHandler(async (req, res, next) => {
 
 const getCohortById = asyncHandler(async (req, res, next) => {
 	const { cohortId } = req.params;
-	const result = await cohort.findById(cohortId, req.user.id);
-	if (!result[0][0]) {
+	const [[result]] = await cohort.findById(cohortId, req.user.id);
+	if (!result) {
 		return next(new ApiError(`There is no result `, 400));
 	}
-	res.status(200).json({ data: result[0][0] });
+	const [teachers] = await cohort.getTeachersFromCohortId(cohortId);
+			if (teachers.length > 0) {
+				const ids = teachers.map((teacher) => teacher.idTeacher);
+				result.teachers = ids;
+			} else {
+				result.teachers = []; // Handle case where no teachers are found
+			}
+	res.status(200).json({ data: result });
 });
 
 /**-----------------------------------------------
@@ -110,10 +130,29 @@ const deleteCohort = asyncHandler(async (req, res, next) => {
 	if (!document) {
 		return next(new ApiError(`No cohort for this id ${cohortId}`, 404));
 	}
-	
-		await cohort.deleteById(cohortId);
+
+	await cohort.deleteById(cohortId);
 
 	res.status(204).send();
 });
+
+const editCohort = asyncHandler(async (req, res, next) => {
+	const { cohortId } = req.params;
+	const { groupNumber, teachers } = req.body;
+	
+		const [[data]] = await cohort.findById(cohortId, req.user.id);
+
+	if (teachers) {
+		// `1-delete all the teachers with this cohortId
+		await associationCohortTeacher.deleteByCohortIds(cohortId)
+	}
+	teachers.map(async (teacherId) => {
+		const association = new associationCohortTeacher(
+			teacherId,
+			data[0].insertId
+		);
+		await association.save();
+	});
+})
 
 module.exports = { createCohort, deleteCohort, getCohortAll, getCohortById };

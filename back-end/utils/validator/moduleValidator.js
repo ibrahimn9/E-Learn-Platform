@@ -3,7 +3,6 @@ const validatorMiddleware = require("../../middlewares/validator");
 
 exports.createModuleValidator = [
 	check("name").notEmpty().withMessage("Module Name is required"),
-	check("editor").notEmpty().withMessage("Should be An Editor For Module"),
 	check("classes")
 		.notEmpty()
 		.withMessage("should Be A class for Module")

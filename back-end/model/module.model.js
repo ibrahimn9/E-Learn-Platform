@@ -13,6 +13,13 @@ class Module {
 			[this.name, this.semester, this.description, this.idEditor]
 		);
 	}
+
+	static getTeachersFromModuleId(idModule) {
+		return db.execute(
+			"SELECT idTeacher FROM  module_teacher_association WHERE (module_teacher_association.idModule = ?)",
+			[idModule]
+		);
+	}
 	static fetchAll(name, idEditor, idClass, semester) {
 		// Check if name ,idEditor , semester is null
 		name = name ? `%${name}%` : null;
@@ -27,7 +34,7 @@ class Module {
 		} else {
 			return db.execute(
 				"SELECT * FROM modules WHERE  (modules.name  LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
-				[ name, name, idEditor, idEditor, semester, semester]
+				[name, name, idEditor, idEditor, semester, semester]
 			);
 		}
 	}

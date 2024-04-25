@@ -17,7 +17,7 @@ class Cohort {
 	}
 	static findById(id, idAdmin) {
 		return db.execute(
-			"SELECT * FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE cohorts.id = ? AND cohorts.adminCreator = ? ",
+			"SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.specialty FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE cohorts.id = ? AND cohorts.adminCreator = ? ",
 			[id, idAdmin]
 		);
 	}
@@ -33,8 +33,14 @@ class Cohort {
 		// Check if groupeNumber is null or undefined, and set it to NULL if it is
 		groupeNumber = groupeNumber || null;
 		return db.execute(
-			"SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.speciality FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE (cohorts.idClass = ? OR ? IS NULL) AND (cohorts.groupeNumber = ? OR ? IS NULL ) AND (cohorts.adminCreator = ? )",
+			"SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.specialty FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE (cohorts.idClass = ? OR ? IS NULL) AND (cohorts.groupeNumber = ? OR ? IS NULL ) AND (cohorts.adminCreator = ? )",
 			[idClass, idClass, groupeNumber, groupeNumber, adminCreator]
+		);
+	}
+	static getTeachersFromCohortId(idCohort) {
+		return db.execute(
+			"SELECT idTeacher FROM  cohorte_teacher_association WHERE (cohorte_teacher_association.idCohorte = ?)",
+			[idCohort]
 		);
 	}
 	static fetchModulesWithinClass(idClass) {
