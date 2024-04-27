@@ -20,6 +20,9 @@ class Module {
 			[idModule]
 		);
 	}
+	static getEditorId(idModule) {
+		return db.execute("SELECT idEditor FROM modules WHERE id = ?", [idModule]);
+	}
 	static fetchAll(name, idEditor, idClass, semester) {
 		// Check if name ,idEditor , semester is null
 		name = name ? `%${name}%` : null;

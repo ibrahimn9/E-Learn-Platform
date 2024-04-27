@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require("uuid");
 const ffmpegStatic = require("ffmpeg-static");
 const ffmpeg = require("fluent-ffmpeg");
 const Mooc = require("../model/mooc.model");
+const Module = require("../model/module.model");
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 ffmpeg.setFfmpegPath(ffmpegStatic);
@@ -37,16 +38,29 @@ const uploadMooc = asyncHandler(async (req, res, next) => {
 					)
 				);
 			} else {
+				// Check If The Teacher is The Editor Of This Module
+				const [[editor]] = await Module.getEditorId(req.body.idModule);
+				if (editor.idEditor !== req.user.id) {
+					return next(
+						new ApiError("You Aren't Allowed To perform This Action ", 403)
+					);
+				}
 				const { videoTitle, videoDescription } = req.body;
+				if (!videoDescription || !videoTitle) {
+					return next(
+						new ApiError("Video Title Or Description Is missed ", 400)
+					);
+				}
+				// Validate The Input
 				const inputBuffer = req.file.buffer;
 				//save buffer to file
 				const inputFileExtension = path.extname(req.file.originalname);
 				const inputFile = `input-${uuidv4()}-${Date.now()}-${inputFileExtension}`;
-				fs.writeFileSync(inputFile, inputBuffer);
+				fs.writeFileSync(`./public/videos/${inputFile}`, inputBuffer);
 				// 1- generate thumbnail image
 				imageInput = `${inputFile}.png`;
 
-				ffmpeg(inputFile)
+				ffmpeg(`./public/videos/${inputFile}`)
 					.screenshots({
 						timestamps: ["10%"],
 						folder: "./public/img",
@@ -58,7 +72,7 @@ const uploadMooc = asyncHandler(async (req, res, next) => {
 					});
 
 				// 2- compress video
-				ffmpeg(inputFile)
+				ffmpeg(`./public/videos/${inputFile}`)
 					.output(req.file.originalname)
 					.videoCodec("libx264")
 					.audioCodec("libmp3lame")
@@ -70,19 +84,22 @@ const uploadMooc = asyncHandler(async (req, res, next) => {
 						const imageFilePath = `./public/img/${imageInput}`;
 						const response = await uploadVideoToUpStreamApi(
 							process.env.UPSTREAM_API_KEY,
-							inputFile,
+							`./public/videos/${inputFile}`,
 							videoTitle,
 							videoDescription,
 							imageFilePath,
 							req.file.originalname
 						);
-						if (!response) {
+						if (response instanceof Error) {
 							return next(
-								new ApiError("There is Error When Uploading File", 500)
+								new ApiError(
+									`The Upload Can't Finish Your Internet Isn't Working`,
+									500
+								)
 							);
 						}
 						fs.unlinkSync(imageFilePath);
-						fs.unlinkSync(inputFile);
+						fs.unlinkSync(`./public/videos/${inputFile}`);
 						fs.unlinkSync(req.file.originalname);
 						const mooc = new Mooc(
 							videoTitle,
@@ -92,17 +109,27 @@ const uploadMooc = asyncHandler(async (req, res, next) => {
 						);
 						mooc.save();
 						res.json({
-							msg: "Files uploaded successfully.",
 							data: response,
 						});
 					})
 					.run();
 			}
 		} catch (error) {
-			console.log(error);
-			res.status(500).send({
-				message: "Something went wrong while uploading...",
-			});
+			return next(
+				new ApiError(
+					"Something went wrong while uploading..." + error.message,
+					500
+				)
+			);
+			// if (imageFilePath) {
+			// 	fs.unlinkSync(imageFilePath);
+			// 	if (inputFile) {
+			// 		fs.unlinkSync(`./public/videos/${inputFile}`);
+			// 		if (req.file.originalname) {
+			// 			fs.unlinkSync(req.file.originalname);
+			// 		}
+			// 	}
+			// }
 		}
 	});
 });
@@ -118,7 +145,7 @@ async function uploadVideoToUpStreamApi(
 	//  Create FormData
 	const formData = new FormData();
 	formData.append("key", apiKey);
-	formData.append("file", fs.createReadStream(videoFile),fileName);
+	formData.append("file", fs.createReadStream(videoFile), fileName);
 	formData.append("file_title", videoTitle);
 	formData.append("file_descr", videoDescription);
 	formData.append("snapshot", fs.createReadStream(videoThumbnail), "image.png");
@@ -130,7 +157,7 @@ async function uploadVideoToUpStreamApi(
 		});
 		return response.data;
 	} catch (error) {
-		return error.message;
+		return error;
 	}
 }
 
@@ -149,7 +176,7 @@ const getMoocByModule = asyncHandler(async (req, res, next) => {
 		return next(new ApiError("there is no Mooc", 404));
 	}
 	res.status(200).json({ data: result });
-})
+});
 
 const getMoocById = asyncHandler(async (req, res, next) => {
 	const { moocId } = req.params;
