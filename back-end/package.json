@@ -23,6 +23,7 @@
 		"express-validator": "^7.0.1",
 		"ffmpeg-static": "^5.2.0",
 		"fluent-ffmpeg": "^2.1.2",
+		"googleapis": "^135.0.0",
 		"jsonwebtoken": "^9.0.2",
 		"morgan": "^1.10.0",
 		"multer": "^1.4.5-lts.1",

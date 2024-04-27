@@ -12,6 +12,10 @@ const classRoute = require("./route/classRoute.js");
 const adminRoute = require("./route/adminRoute.js");
 const userRoute = require("./route/userRoute.js");
 const moocRoute = require("./route/moocRoute.js");
+const teacherRoute = require("./route/teacherRoute.js");
+const chapterRoute = require("./route/chapterRoute.js");
+const documentRoute = require("./route/documentRoute.js");
+const studentRoute = require("./route/studentRoute.js");
 const resourceRoute = require("./route/resourceRoute.js")
 const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
@@ -47,7 +51,11 @@ app.use("/api/v1/class", classRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/moocs", moocRoute);
-app.use("/api/v1/resource",resourceRoute)
+app.use("/api/v1/resource", resourceRoute)
+app.use("/api/v1/teacher/chapter", chapterRoute);
+app.use("/api/v1/teacher/document", documentRoute);
+app.use("/api/v1/teacher", teacherRoute);
+app.use("/api/v1/student", studentRoute);
 
 // For Unmounted Url
 app.all("*", (req, res, next) => {

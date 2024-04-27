@@ -81,6 +81,23 @@ WHERE id = ?;`,
 			[idModule, classId]
 		);
 	}
+	static getModulesByCohorteId(cohorteId) {
+		return db.execute(
+			`SELECT modules.*
+       FROM modules
+       JOIN module_cohorte_association ON modules.id = module_cohorte_association.idModule
+       WHERE module_cohorte_association.idCohorte = ?`,
+			[cohorteId]
+		);
+	}
+	static getModulesWithEditors() {
+		return db.execute(`SELECT modules.id AS moduleId, 
+    teachers.id AS id, 
+    teachers.fullName AS fullName
+        FROM modules
+        INNER JOIN teachers ON modules.idEditor = teachers.id;
+    `);
+	}
 }
 
 module.exports = Module;
