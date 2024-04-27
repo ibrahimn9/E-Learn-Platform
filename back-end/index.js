@@ -11,6 +11,8 @@ const moduleRoute = require("./route/moduleRoute");
 const classRoute = require("./route/classRoute.js");
 const adminRoute = require("./route/adminRoute.js");
 const userRoute = require("./route/userRoute.js");
+const moocRoute = require("./route/moocRoute.js");
+const resourceRoute = require("./route/resourceRoute.js")
 const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
 const Admin = require("./model/admin.model.js");
@@ -21,10 +23,10 @@ const app = express();
 // Serve static files from the public directory
 app.use(cors());
 app.use(
-  cors({
-    origin: "http://localhost:5173", // Update with your client's origin
-    credentials: true, 
-  })
+	cors({
+		origin: "http://localhost:5173", // Update with your client's origin
+		credentials: true,
+	})
 );
 
 app.set("view engine", "ejs");
@@ -34,8 +36,8 @@ app.use(cookieParser());
 
 //set express view engine
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-  console.log(`mode: ${process.env.NODE_ENV}`);
+	app.use(morgan("dev"));
+	console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
 app.use("/api/v1/auth", routerAuth);
@@ -44,10 +46,12 @@ app.use("/api/v1/module", moduleRoute);
 app.use("/api/v1/class", classRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/admin", adminRoute);
+app.use("/api/v1/moocs", moocRoute);
+app.use("/api/v1/resource",resourceRoute)
 
 // For Unmounted Url
 app.all("*", (req, res, next) => {
-  next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
+	next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
 });
 
 // Global error handling middleware for express
@@ -55,22 +59,22 @@ app.use(globalError);
 
 const server = http.createServer(app);
 server.listen(PORT, async () => {
-  try {
-    await pool.execute("SELECT 1");
-    console.log(`Connected To Database `);
-    console.log(`Server is Listening on PORT ${PORT}`);
-  } catch (error) {
-    console.log(error);
-  }
+	try {
+		await pool.execute("SELECT 1");
+		console.log(`Connected To Database `);
+		console.log(`Server is Listening on PORT ${PORT}`);
+	} catch (error) {
+		console.log(error);
+	}
 });
 
 // Event => list =>callback(err)
 // Handle rejection outside express
 process.on("unhandledRejection", (err) => {
-  console.error(`UnhandledRejection Errors: ${err.name} | ${err.message}`);
-  // just in case of the current request
-  server.close(() => {
-    console.error(`Shutting down....`);
-    process.exit(1);
-  });
+	console.error(`UnhandledRejection Errors: ${err.name} | ${err.message}`);
+	// just in case of the current request
+	server.close(() => {
+		console.error(`Shutting down....`);
+		process.exit(1);
+	});
 });

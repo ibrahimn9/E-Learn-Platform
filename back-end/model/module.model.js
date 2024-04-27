@@ -28,18 +28,21 @@ class Module {
 		// Check if idClass is null
 		if (idClass) {
 			return db.execute(
-				"SELECT * FROM modules  LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id  WHERE class_module_association.idClass = ? AND (modules.name LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
+				"SELECT modules.id, modules.name,modules.semester,modules.description,classes.id AS classId FROM modules  LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id  WHERE class_module_association.idClass = ? AND (modules.name LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
 				[idClass, name, name, idEditor, idEditor, semester, semester]
 			);
 		} else {
 			return db.execute(
-				"SELECT * FROM modules WHERE  (modules.name  LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
+				"SELECT modules.id, modules.name,modules.semester,modules.description,classes.id AS classId FROM modules LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id  WHERE  (modules.name  LIKE ? OR ? IS NULL) AND (modules.idEditor = ? OR ? IS NULL) AND (modules.semester = ? OR ? IS NULL)",
 				[name, name, idEditor, idEditor, semester, semester]
 			);
 		}
 	}
 	static findById(id) {
-		return db.execute("SELECT * FROM modules WHERE id = ? ", [id]);
+		return db.execute(
+			"SELECT modules.id, modules.name,modules.semester,modules.description,classes.id AS classId FROM modules  LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id WHERE modules.id = ? ",
+			[id]
+		);
 	}
 	static deleteById(id) {
 		return db.execute("DELETE FROM modules WHERE id = ?", [id]);
