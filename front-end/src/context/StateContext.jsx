@@ -7,6 +7,7 @@ export const StateContext = ({ children }) => {
   const [refetchTeachers, setRefetchTeachers] = useState(false);
   const [refetchStudents, setRefetchStudents] = useState(false);
   const [refetchCohorts, setRefetchCohorts] = useState(false);
+  const [refetchModules, setRefetchModules] = useState(false);
 
   return (
     <Context.Provider
@@ -19,6 +20,8 @@ export const StateContext = ({ children }) => {
         setRefetchStudents,
         refetchCohorts,
         setRefetchCohorts,
+        refetchModules,
+        setRefetchModules,
       }}
     >
       {children}
