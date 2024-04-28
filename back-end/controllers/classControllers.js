@@ -42,6 +42,11 @@ const updateSpecialty = asyncHandler(async (req, res, next) => {
 });
 
 const deleteSpecialty = asyncHandler(async (req, res, next) => {
+
+	const [[document]] = await Class.findById(req.params.classId);
+	if (!document) {
+		return next(new ApiError(`No class for this id ${req.params.classId}`, 404));
+	}
 	await Class.deleteById(req.params.classId);
 	res.status(204).send();
 });

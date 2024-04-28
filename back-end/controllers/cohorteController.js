@@ -162,3 +162,4 @@ const editCohort = asyncHandler(async (req, res, next) => {
 });
 
 module.exports = { createCohort, deleteCohort, getCohortAll, getCohortById, editCohort };
+

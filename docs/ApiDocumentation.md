@@ -59,3 +59,8 @@ Each endpoint manipulates or displays information related to the Users(Student -
 
 * [get-user-by-id](./users/get-user-by-id.md) : `GET {host}/api/v1/users/:userId?role=`
 * [get-user-all](./users/get-user-all.md) : `GET {host}/api/v1/users?name=&email=&role=`
+
+
+### Current Moocs related
+
+* [upload-mooc](./moocs/upload-mooc.md) : `POST {host}/api/v1/moocs/upload`
