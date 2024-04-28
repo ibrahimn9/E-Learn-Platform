@@ -26,6 +26,12 @@ const getUserAll = asyncHandler(async (req, res, next) => {
       const modules = await Teacher.getTeacherWithModules(user.id);
       user.modules = modules;
     }
+  } else if (role === "editor") {
+    const [data] = await Teacher.getEditors();
+    if (!data) {
+      return next(new ApiError("there is no editors", 400));
+    }
+    return res.status(200).json(data);
   } else {
     const [usersStudent] = await Student.findByNameOrEmail(
       name,
@@ -85,4 +91,16 @@ const getUserById = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: user, role });
 });
 
-module.exports = { getUserAll, getUserById };
+const getEditors = asyncHandler(async (req, res, next) => {
+  try {
+    const [editors] = await Teacher.getEditors();
+    if (!editors || editors.length === 0) {
+      return next(new ApiError("No editors found", 404));
+    }
+    return res.status(200).json(editors);
+  } catch (error) {
+    return next(new ApiError("Internal Server Error", 500));
+  }
+});
+
+module.exports = { getUserAll, getUserById, getEditors };

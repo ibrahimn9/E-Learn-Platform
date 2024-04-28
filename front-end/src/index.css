@@ -27,3 +27,7 @@ tr {
   text-align: center;
   color: #202224;
 }
+
+.teacher-name {
+  word-break: break-word;
+}

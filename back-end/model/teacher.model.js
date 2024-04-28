@@ -95,6 +95,14 @@ class Teacher {
       throw error;
     }
   }
+  static getEditors() {
+    return db.execute(`SELECT modules.id AS moduleId, 
+    teachers.id AS id, 
+    teachers.fullName AS fullName
+        FROM modules
+        INNER JOIN teachers ON modules.idEditor = teachers.id;
+    `);
+  }
 }
 
 module.exports = Teacher;
