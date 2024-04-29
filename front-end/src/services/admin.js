@@ -39,7 +39,7 @@ const insertOneStudent = async (body) => {
 };
 
 const insertStudents = async (formData) => {
-  return axios.post(`${baseUrl}/insert-new-teachers`, formData, {
+  return axios.post(`${baseUrl}/insert-new-students`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

@@ -434,7 +434,12 @@ const StudentTable = ({ students }) => {
                 <td className="p-4">{student.fullname}</td>
                 <td className="p-4">{student.email}</td>
                 <td className="p-4">Active</td>
-                <td className="p-4">1CS</td>
+                <td className="p-4">
+                  {
+                    cohorts.find((cohort) => cohort.id === student.idCohorte)
+                      ?.name
+                  }
+                </td>
                 <td className="p-4">
                   {
                     cohorts?.find((cohort) => cohort.id === student.idCohorte)

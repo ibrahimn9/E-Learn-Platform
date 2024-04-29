@@ -10,4 +10,5 @@ router.use(authServices.protect, authServices.allowedTo("admin"));
 router.route("/").get(getUserAll);
 router.route("/:userId").get(getUserById);
 
+
 module.exports = router;

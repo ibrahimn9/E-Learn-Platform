@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const {
-	createModule,
-	deleteModule,
-	getModuleAll,
-	getModuleById,
-	updateModule,
+  createModule,
+  deleteModule,
+  getModuleAll,
+  getModuleById,
+  updateModule,
 } = require("../controllers/moduleController");
 
 const { createModuleValidator } = require("../utils/validator/moduleValidator");
