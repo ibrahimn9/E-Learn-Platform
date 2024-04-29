@@ -1,7 +1,7 @@
 const ApiError = require("../utils/ApiError.js");
 const asyncHandler = require("express-async-handler");
 const Document = require('../model/document.model.js');
-const {uploadFile} = require('../utils/documentCloud.js');
+const {uploadFile,deleteFile} = require('../utils/documentCloud.js');
 const fs = require('fs');
 
 /**-----------------------------------------------
@@ -22,9 +22,22 @@ const addNewDocument = asyncHandler(async (req,res,next)=>{
     return res.status(201).json({message:'document inserted succefully'});
 });
 
+/**-----------------------------------------------
+ * @desc    insert new document
+ * @route   /api/v1/teacher/document/:documentId
+ * @method  DELETE
+ * @access  Teacher
+------------------------------------------------*/
+const deleteDocument = asyncHandler(async (req,res,next) => {
+    const {documentId} = req.params;
+    const {link} = req.body;
+    await deleteFile(link);
+    // await Document.deleteById(documentId);
+    res.status(203).json({message:"document deleted"});
 
-
+})
 
 module.exports ={
     addNewDocument,
+    deleteDocument
 }

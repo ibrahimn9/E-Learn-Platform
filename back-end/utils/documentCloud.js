@@ -41,6 +41,29 @@ const uploadFile = async (file) => {
     });
 };
 
+const extractFileId =async (fileLink) => {
+    const match = await fileLink.match(/\/file\/d\/([^/]+)/);
+    return await match ? match[1] : null;
+};
+
+const deleteFile = async (fileId) => {
+    const fileid = extractFileId(fileId);
+    const authClient = await authorize();
+    const drive = google.drive({ version: 'v3', auth: authClient });
+
+    try {
+        await drive.files.delete({
+            fileId: fileid,
+        });
+        console.log('File deleted successfully.');
+    } catch (error) {
+        console.error('Error deleting file:', error.message);
+        throw error;
+    }
+};
+
+
 module.exports = {
-    uploadFile
+    uploadFile,
+    deleteFile
 };

@@ -18,6 +18,11 @@ class Document {
     static getAllDocumentsForChapter(idChapter){
         return db.execute('SELECT * FROM documents WHERE idChapter = ?', [idChapter])
     }
+    static deleteById(idDocument){
+        return db.execute(
+            `DELETE FROM documents where id=?`,[idDocument]
+        )
+    }
 }
 
 module.exports = Document;

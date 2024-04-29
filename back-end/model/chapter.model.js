@@ -18,6 +18,11 @@ class Chapter{
             [idModule]
         );
     }
+    static deleteById(idChapter){
+        return db.execute(
+            `DELETE FROM chapters where id=?`,[idChapter]
+        )
+    }
 }
 
 module.exports = Chapter;

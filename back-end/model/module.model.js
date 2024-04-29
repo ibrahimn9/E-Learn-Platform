@@ -98,6 +98,12 @@ WHERE id = ?;`,
         INNER JOIN teachers ON modules.idEditor = teachers.id;
     `);
 	}
+	static getModulesOfTeacher(teacherId){
+		return db.execute(`SELECT m.*
+			FROM modules m
+			INNER JOIN module_teacher_association mta ON m.id = mta.idModule
+			WHERE mta.idTeacher = ?`,[teacherId]);
+	}
 }
 
 module.exports = Module;
