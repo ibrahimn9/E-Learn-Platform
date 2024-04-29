@@ -23,7 +23,7 @@ const addNewDocument = asyncHandler(async (req,res,next)=>{
 });
 
 /**-----------------------------------------------
- * @desc    insert new document
+ * @desc    delete document
  * @route   /api/v1/teacher/document/:documentId
  * @method  DELETE
  * @access  Teacher
