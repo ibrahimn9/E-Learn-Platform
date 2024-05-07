@@ -22,9 +22,19 @@ const addNewDocument = asyncHandler(async (req,res,next)=>{
     return res.status(201).json({message:'document inserted succefully'});
 });
 
+const deleteDocument = asyncHandler(async (req,res,next) => {
+    const {documentId} = req.params;
+    const {link} = req.body;
+    //await deleteFile(link);
+    await Document.deleteById(documentId);
+    res.status(203).json({message:"document deleted"});
+
+})
+
 
 
 
 module.exports ={
     addNewDocument,
+    deleteDocument,
 }

@@ -156,13 +156,13 @@ const createModule = asyncHandler(async (req, res, next) => {
 ------------------------------------------------*/
 
 const deleteModule = asyncHandler(async (req, res, next) => {
-	const { moduleId } = req.params;
-	const [[document]] = await Module.findById(moduleId);
-	if (!document) {
-		return next(new ApiError(`No Module for this id ${moduleId}`, 404));
-	}
-	await Module.deleteById(moduleId);
-	res.status(204).send();
+  const { moduleId } = req.params;
+  const [[document]] = await Module.findById(moduleId);
+  if (!document) {
+    return next(new ApiError(`No Module for this id ${moduleId}`, 404));
+  }
+  await Module.deleteById(moduleId);
+  res.status(204).send();
 });
 
 /**-----------------------------------------------
@@ -250,10 +250,24 @@ const updateModule = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "Module Updated" });
 });
 
+const getModulesWithAllData = async (req, res, next) => {
+  const [modules] = await Module.getAll();
+  for (let module of modules) {
+    const [chapters] = await Chapter.getAllByModuleId(module.id);
+    for (let chapter of chapters) {
+      const [documents] = await Document.getAllDocumentsForChapter(chapter.id);
+      chapter.documents = [...documents];
+    }
+    module.chapters = [...chapters];
+  }
+  return res.status(200).json(modules);
+};
+
 module.exports = {
   getModuleAll,
   getModuleById,
   createModule,
   deleteModule,
   updateModule,
+  getModulesWithAllData,
 };

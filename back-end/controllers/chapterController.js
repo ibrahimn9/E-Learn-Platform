@@ -39,7 +39,14 @@ const getAllChapters = asyncHandler(async(req,res,next)=>{
     return res.status(200).json(chapters); 
 })
 
-module.exports ={
+const deleteChapter = asyncHandler(async (req,res,next)=>{
+    const {chapterId} = req.params;
+    await Chapter.deleteById(chapterId);
+    res.status(203).json({message:'chapter deleted'});
+})
+
+module.exports = {
     createChapter,
-    getAllChapters
+    getAllChapters,
+    deleteChapter
 }

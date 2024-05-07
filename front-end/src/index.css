@@ -12,8 +12,6 @@ body {
   list-style: none;
 }
 
-
-
 .auth-bg {
   background-image: url(./assets/ellipse.svg);
   background-repeat: no-repeat;
@@ -21,8 +19,8 @@ body {
 }
 
 tr {
-  border-bottom: 1px solid #D5D5D5;
-  border-top: 1px solid #D5D5D5;
+  border-bottom: 1px solid #d5d5d5;
+  border-top: 1px solid #d5d5d5;
   border-collapse: collapse;
   text-align: center;
   color: #202224;
@@ -30,4 +28,32 @@ tr {
 
 .teacher-name {
   word-break: break-word;
+}
+
+.left-border {
+  position: relative;
+}
+
+.left-border::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: #00194f;
+}
+
+.top-border {
+  position: relative;
+}
+
+.top-border::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  left: 0;
+  top: 0;
+  background-color: #00194f;
 }

@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import { TeacherSideBar } from "../../components";
 
 const Home = () => {
   return (
-    <div>Home</div>
-  )
-}
+    <div className="h-screen bg-[#EFF5FF]">
+      <TeacherSideBar />
+    </div>
+  );
+};
 
-export default Home
+export default Home;

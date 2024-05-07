@@ -20,6 +20,15 @@ class Module {
       [idModule]
     );
   }
+
+  
+  static getModulesOfTeacher(teacherId){
+		return db.execute(`SELECT m.*
+			FROM modules m
+			INNER JOIN module_teacher_association mta ON m.id = mta.idModule
+			WHERE mta.idTeacher = ?`,[teacherId]);
+	}
+
   static fetchAll(name, idEditor, idClass, semester) {
     // Check if name ,idEditor , semester is null
     name = name ? `%${name}%` : null;
@@ -43,6 +52,11 @@ class Module {
       "SELECT modules.id, modules.idEditor, modules.name,modules.semester,modules.description,classes.id AS classId FROM modules  LEFT JOIN class_module_association ON modules.id =class_module_association.idModule  LEFT JOIN classes ON  class_module_association.idClass = classes.id WHERE modules.id = ? ",
       [id]
     );
+  }
+  static getAll(){
+    return db.execute(`
+    SELECT * FROM modules
+    `);
   }
   static deleteById(id) {
     return db.execute("DELETE FROM modules WHERE id = ?", [id]);

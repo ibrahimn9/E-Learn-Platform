@@ -23,11 +23,11 @@ const videoFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-	fileFilter: videoFilter,
+	//fileFilter: videoFilter,
 	storage: multer.memoryStorage(),
 }).single("mooc");
 
-const uploadMooc = asyncHandler(async (req, res, next) => {
+const  	uploadMooc = asyncHandler(async (req, res, next) => {
 	upload(req, res, async function (err) {
 		try {
 			if (err) {
@@ -39,12 +39,12 @@ const uploadMooc = asyncHandler(async (req, res, next) => {
 				);
 			} else {
 				// Check If The Teacher is The Editor Of This Module
-				const [[editor]] = await Module.getEditorId(req.body.idModule);
-				if (editor.idEditor !== req.user.id) {
-					return next(
-						new ApiError("You Aren't Allowed To perform This Action ", 403)
-					);
-				}
+				// const [[editor]] = await Module.getEditorId(req.body.idModule);
+				// if (editor.idEditor !== req.user.id) {
+				// 	return next(
+				// 		new ApiError("You Aren't Allowed To perform This Action ", 403)
+				// 	);
+				// }
 				const { videoTitle, videoDescription } = req.body;
 				if (!videoDescription || !videoTitle) {
 					return next(

@@ -5,6 +5,8 @@ import AdminHome from "./pages/admin/Home";
 import TeacherHome from "./pages/teacher/Home";
 import StudentHome from "./pages/student/Home";
 import { Teacher, Student, CreateCohort, CreateModules } from "./pages/admin";
+import CourseManagement from "./pages/teacher/CourseManagement";
+import { MoocManagement, Resource } from "./pages/teacher";
 import { useStateContext } from "./context/StateContext";
 import Cookies from "js-cookie";
 import auth from "./services/auth";
@@ -33,15 +35,28 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route exact path="/" element={<Landing />} />
+
         <Route path="/auth" element={<Authentification />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         <Route path="/admin/:id" element={<AdminHome />} />
-        <Route path="/teacher/:id" element={<TeacherHome />} />
-        <Route path="/student/:id" element={<StudentHome />} />
         <Route path="/admin/:id/manage-teachers" element={<Teacher />} />
         <Route path="/admin/:id/manage-students" element={<Student />} />
         <Route path="/admin/:id/manage-cohorts" element={<CreateCohort />} />
         <Route path="/admin/:id/manage-modules" element={<CreateModules />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+
+        <Route path="/teacher/:id" element={<TeacherHome />} />
+        <Route
+          path="/teacher/:id/course-management"
+          element={<CourseManagement />}
+        />
+        <Route
+          path="/teacher/:id/mooc-management"
+          element={<MoocManagement />}
+        />
+        <Route path="/teacher/:id/resource-management" element={<Resource />} />
+
+        <Route path="/student/:id" element={<StudentHome />} />
       </Routes>
     </BrowserRouter>
   );
