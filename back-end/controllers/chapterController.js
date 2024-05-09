@@ -34,7 +34,7 @@ const getAllChapters = asyncHandler(async(req,res,next)=>{
     }
     for (let chapter of chapters){
         const [documents] = await Document.getAllDocumentsForChapter(chapter.id);
-        chapter.file = [...documents];
+        chapter.documents = [...documents];
     }
     return res.status(200).json(chapters); 
 })

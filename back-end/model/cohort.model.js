@@ -17,7 +17,7 @@ class Cohort {
   }
   static findById(id, idAdmin) {
     return db.execute(
-      "SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.specialty FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE cohorts.id = ? AND cohorts.adminCreator = ? ",
+      "SELECT cohorts.id , cohorts.groupeNumber ,cohorts.adminCreator ,classes.name , classes.speciality FROM cohorts LEFT JOIN classes ON cohorts.idClass = classes.id WHERE cohorts.id = ? AND cohorts.adminCreator = ? ",
       [id, idAdmin]
     );
   }

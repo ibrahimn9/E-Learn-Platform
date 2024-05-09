@@ -27,9 +27,14 @@ const editModule = async (id, body) => {
   });
 };
 
+const getModuleById = async (moduleId) => {
+  return axios.get(`${baseUrl}/${moduleId}`, { withCredentials: true });
+};
+
 export default {
   getAll,
   createModule,
   deleteModule,
-  editModule
+  editModule,
+  getModuleById
 };

@@ -98,6 +98,8 @@ const CreateModules = () => {
       if (response.status >= 200 && response.status < 300) {
         setSuccessMsg(response.data.message);
         setRefetchModules(!refetchModules);
+        setTeachers([]);
+        setEditor("");
       }
     } catch (error) {
       if (error.response) {

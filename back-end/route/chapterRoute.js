@@ -4,7 +4,7 @@ const {createChapter,getAllChapters, deleteChapter} = require("../controllers/ch
 const {chapterValidator} =  require("../utils/validator/chapterValidator");
 const router = express.Router();
 
-router.use(authServices.protect, authServices.allowedTo("teacher"));
+
 // /api/v1/teacher/chapter/insert-new-chapter/:moduleId
 router.post('/insert-new-chapter/:moduleId',chapterValidator,createChapter);
 // /api/v1/teacher/chapter/:chapterId

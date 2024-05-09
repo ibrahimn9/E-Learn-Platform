@@ -579,7 +579,9 @@ const ModuleTable = ({ allTeachers, classes }) => {
             {currentModules?.map((module, index) => (
               <tr key={index}>
                 <td className="p-4">{module.name.toUpperCase()}</td>
-                <td className="p-4">2CP</td>
+                <td className="p-4">
+                  {classes.find((_class) => _class.id === module.classId)?.name}
+                </td>
                 <td className="p-4">
                   {
                     allTeachers.find(

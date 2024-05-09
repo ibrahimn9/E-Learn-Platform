@@ -1,8 +1,8 @@
 const ApiError = require("../utils/ApiError.js");
 const asyncHandler = require("express-async-handler");
-const Document = require('../model/document.model.js');
-const {uploadFile} = require('../utils/documentCloud.js');
-const fs = require('fs');
+const Document = require("../model/document.model.js");
+const { uploadFile } = require("../utils/documentCloud.js");
+const fs = require("fs");
 
 /**-----------------------------------------------
  * @desc    insert new document
@@ -11,30 +11,37 @@ const fs = require('fs');
  * @access  Teacher
 ------------------------------------------------*/
 
-const addNewDocument = asyncHandler(async (req,res,next)=>{
-    const file = req.file;
-    const {chapterId} = req.params;
-    const {title,description,type} = req.body;
-    const response = await uploadFile(file);
-    const document = new Document(title,description,type,response.id,chapterId);
+const addNewDocument = asyncHandler(async (req, res, next) => {
+  const file = req.file;
+  const { chapterId } = req.params;
+  const { title, description, type } = req.body;
+  const response = await uploadFile(file);
+  const document = new Document(
+    title,
+    description,
+    type,
+    response.id,
+    chapterId
+  );
+  try {
     await document.save();
     await fs.unlinkSync(file.path);
-    return res.status(201).json({message:'document inserted succefully'});
+  } catch (error) {
+    return error;
+  }
+
+  return res.status(201).json({ message: "document inserted succefully" });
 });
 
-const deleteDocument = asyncHandler(async (req,res,next) => {
-    const {documentId} = req.params;
-    const {link} = req.body;
-    //await deleteFile(link);
-    await Document.deleteById(documentId);
-    res.status(203).json({message:"document deleted"});
+const deleteDocument = asyncHandler(async (req, res, next) => {
+  const { documentId } = req.params;
+  const { link } = req.body;
+  //await deleteFile(link);
+  await Document.deleteById(documentId);
+  res.status(203).json({ message: "document deleted" });
+});
 
-})
-
-
-
-
-module.exports ={
-    addNewDocument,
-    deleteDocument,
-}
+module.exports = {
+  addNewDocument,
+  deleteDocument,
+};

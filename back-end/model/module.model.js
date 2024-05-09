@@ -21,13 +21,15 @@ class Module {
     );
   }
 
-  
-  static getModulesOfTeacher(teacherId){
-		return db.execute(`SELECT m.*
+  static getModulesOfTeacher(teacherId) {
+    return db.execute(
+      `SELECT m.*
 			FROM modules m
 			INNER JOIN module_teacher_association mta ON m.id = mta.idModule
-			WHERE mta.idTeacher = ?`,[teacherId]);
-	}
+			WHERE mta.idTeacher = ?`,
+      [teacherId]
+    );
+  }
 
   static fetchAll(name, idEditor, idClass, semester) {
     // Check if name ,idEditor , semester is null
@@ -53,7 +55,16 @@ class Module {
       [id]
     );
   }
-  static getAll(){
+  static getModulesByCohorteId(cohorteId) {
+    return db.execute(
+      `SELECT modules.*
+       FROM modules
+       JOIN module_cohorte_association ON modules.id = module_cohorte_association.idModule
+       WHERE module_cohorte_association.idCohorte = ?`,
+      [cohorteId]
+    );
+  }
+  static getAll() {
     return db.execute(`
     SELECT * FROM modules
     `);
@@ -85,6 +96,17 @@ WHERE id = ?;`,
         idEditor,
         id,
       ]
+    );
+  }
+  static getModulesByStudentId(idStudent) {
+    return db.execute(
+      `SELECT DISTINCT modules.*
+      FROM modules
+      JOIN module_cohorte_association ON modules.id = module_cohorte_association.idModule
+      JOIN cohorts ON module_cohorte_association.idCohorte = cohorts.id
+      JOIN students ON cohorts.id = students.idCohorte
+      WHERE students.id = ?`,
+      [idStudent]
     );
   }
   static fetchCohortsByClassIdAndModuleId(idModule, classId) {

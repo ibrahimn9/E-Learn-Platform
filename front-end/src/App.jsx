@@ -10,6 +10,7 @@ import { MoocManagement, Resource } from "./pages/teacher";
 import { useStateContext } from "./context/StateContext";
 import Cookies from "js-cookie";
 import auth from "./services/auth";
+import Module from "./pages/student/Module";
 
 const App = () => {
   const token = Cookies.get("access_token");
@@ -57,6 +58,7 @@ const App = () => {
         <Route path="/teacher/:id/resource-management" element={<Resource />} />
 
         <Route path="/student/:id" element={<StudentHome />} />
+        <Route path="/student/:id/module/:id" element={<Module />} />
       </Routes>
     </BrowserRouter>
   );

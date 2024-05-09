@@ -26,9 +26,14 @@ const editCohort = async (cohortId, body) => {
   });
 };
 
+const getCohortById = async (id) => {
+  return axios.get(`${baseUrl}/${id}`, { withCredentials: true });
+};
+
 export default {
   getAll,
   createCohort,
   deleteCohort,
-  editCohort
+  editCohort,
+  getCohortById
 };

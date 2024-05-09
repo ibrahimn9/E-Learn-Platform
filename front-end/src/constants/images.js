@@ -17,6 +17,7 @@ import addVideo from "../assets/add-video.svg";
 import addElps from "../assets/addEllpse.svg"
 import mooc from "../assets/mooc.svg"
 import playBtn from "../assets/play-btn.svg" 
+import file from "../assets/file.svg"
 
 export default {
   logo,
@@ -37,5 +38,6 @@ export default {
   addVideo,
   addElps,
   mooc,
-  playBtn
+  playBtn,
+  file
 };

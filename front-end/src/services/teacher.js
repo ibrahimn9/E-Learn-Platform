@@ -39,6 +39,11 @@ const deleteDocument = async (documentId) => {
   return axios.delete(`${baseUrl}/document/${documentId}`)
 }
 
+const getChaptersByModuleId = async (moduleId) => {
+  return await axios.get(`${baseUrl}/chapter/${moduleId}`, { withCredentials: true });
+};
+
+
 
 export default {
   getAll,
@@ -46,5 +51,6 @@ export default {
   insertChapter,
   deleteChapter,
   insertDocument,
-  deleteDocument
+  deleteDocument,
+  getChaptersByModuleId
 };

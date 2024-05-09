@@ -23,6 +23,24 @@ const getModulesByCohorteId = asyncHandler(async(req,res,next)=>{
     return res.status(200).json(modules);
 })
 
+
+/**-----------------------------------------------
+ * @desc    get all modules of student
+ * @route   /api/v1/student/modules/:studentId
+ * @method  GET
+ * @access  Student
+------------------------------------------------*/
+const getModulesByStudentId = async(req,res,next)=>{
+    const {studentId} = req.params;
+    const [modules] = await Module.getModulesByStudentId(studentId);
+    console.log(studentId)
+    if(!modules){
+        return res.status(404).json({message:"modules not found"});
+    }
+    return res.status(200).json(modules);
+}
+
 module.exports ={
-    getModulesByCohorteId
+    getModulesByCohorteId,
+    getModulesByStudentId
 }
