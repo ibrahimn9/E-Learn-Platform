@@ -16,15 +16,24 @@ const teacherRoute = require("./route/teacherRoute.js");
 const chapterRoute = require("./route/chapterRoute.js");
 const documentRoute = require("./route/documentRoute.js");
 const studentRoute = require("./route/studentRoute.js");
-const resourceRoute = require("./route/resourceRoute.js")
+const resourceRoute = require("./route/resourceRoute.js");
+const questionRoute = require("./route/questionRoute.js");
+const resultRoute = require("./route/resultRoute");
+const quizRoute = require("./route/quizRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
-const Admin = require("./model/admin.model.js");
-const { resolveInclude } = require("ejs");
 const PORT = process.env.PORT;
 const app = express();
+const session = require("express-session");
 
 // Serve static files from the public directory
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET_KEY,
+		saveUninitialized: false,
+		resave: false,
+	})
+);
 app.use(cors());
 app.use(
 	cors({
@@ -51,12 +60,14 @@ app.use("/api/v1/class", classRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/moocs", moocRoute);
-app.use("/api/v1/resource", resourceRoute)
+app.use("/api/v1/resource", resourceRoute);
 app.use("/api/v1/teacher/chapter", chapterRoute);
 app.use("/api/v1/teacher/document", documentRoute);
 app.use("/api/v1/teacher", teacherRoute);
 app.use("/api/v1/student", studentRoute);
-
+app.use("/api/v1/questions", questionRoute);
+app.use("/api/v1/quiz", quizRoute);
+app.use("/api/v1/result", resultRoute);
 // For Unmounted Url
 app.all("*", (req, res, next) => {
 	next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));

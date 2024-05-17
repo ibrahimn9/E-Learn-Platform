@@ -47,7 +47,7 @@ const getUserAll = asyncHandler(async (req, res, next) => {
       req.user.id
     );
     usersTeacher.map((value) => {
-      value["role"] = "teacher	";
+      value["role"] = "teacher";
     });
     users = [...usersStudent, ...usersTeacher];
   }

@@ -71,7 +71,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 		const [[rows], fields] = to;
 		// const DateCreated = new Date(rows.created_at);
 		// const DateExpiration = DateCreated.getTime() + 20 * 60 * 1000 - Date.now();
-		if (!rows /*||  DateExpiration < 0 */ ) {
+		if (!rows /*||  DateExpiration < 0 */) {
 			// 3.delete the existing token
 			if (rows) {
 				await VerificationToken.deleteById(rows.id);
@@ -367,10 +367,10 @@ const resetPasswordController = asyncHandler(async (req, res, next) => {
 	if (role === "student") {
 		user = await Student.findById(rows[0].idUser);
 		data = user[0][0];
-	} else if ((role === "teacher")) {
+	} else if (role === "teacher") {
 		user = await Teacher.findById(rows[0].idUser);
 		data = user[0][0];
-	} else if(role === "admin") {
+	} else if (role === "admin") {
 		user = await Admin.findById(rows[0].idUser);
 		data = user[0][0];
 	}
@@ -466,51 +466,46 @@ const resendEmail = asyncHandler(async (req, res, next) => {
 
 const verifytoken = asyncHandler(async (req, res, next) => {
 	// 1) check if token exist
-	const {token} = req.body;
-  
+	const { token } = req.body;
+
 	if (!token)
-	  return next(
-		new ApiError(
-		  "You are not log in , Please log in to access to this route ",
-		  400
-		)
-	  );
-  
+		return next(
+			new ApiError(
+				"You are not log in , Please log in to access to this route ",
+				400
+			)
+		);
+
 	// 2) verify the token (no changes happen , expired token ) :: if change happen in the payload or the token is expired
 	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-	if(! decoded){
-	  return next(
-		new ApiError(
-		  "invalid token",
-		  401
-		)
-	  );
+	if (!decoded) {
+		return next(new ApiError("invalid token", 401));
 	}
-  
+
 	// 3) verify if the user exist in database (this step is important when user is deleted by admin he also has the ability to access route because have the token )
 	const role = decoded.role;
 	if (role === "student") {
-	  // Searching in the students table
-	  user = await Student.findById(decoded.userId);
+		// Searching in the students table
+		user = await Student.findById(decoded.userId);
 	} else if (role === "teacher") {
-	  // Searching in the teachers table
-	  user = await Teacher.findById(decoded.userId);
+		// Searching in the teachers table
+		user = await Teacher.findById(decoded.userId);
 	} else {
-	  // Searching in the admins table
-	  user = await Admin.findById(decoded.userId);
+		// Searching in the admins table
+		user = await Admin.findById(decoded.userId);
 	}
 	if (!user) {
-	  return next(
-		new ApiError(
-		  "The user that belong to this token has no longer exist ",
-		  400
-		)
-	  );
+		return next(
+			new ApiError(
+				"The user that belong to this token has no longer exist ",
+				400
+			)
+		);
 	}
-	return res.status(200).json({userData: user[0][0], role})
-  });
-  
-  module.exports = {
+	return res.status(200).json({ userData: user[0][0], role });
+});
+
+module.exports = {
 	signInController,
 	verifyUserAccountCtrl,
 	logoutController,
@@ -520,4 +515,4 @@ const verifytoken = asyncHandler(async (req, res, next) => {
 	allowedTo,
 	protect,
 	verifytoken,
-  };
+};

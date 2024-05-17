@@ -9,7 +9,7 @@ class Resource {
   }
   save() {
     return db.execute(
-      `INSERT INTO resources (description,type,link,idModule) VALUES (?,?,?,?) `,
+      `INSERT INTO resources (description,type,link,  idModule) VALUES (?,?,?,?) `,
       [this.description, this.type, this.link, this.idModule]
     );
   }

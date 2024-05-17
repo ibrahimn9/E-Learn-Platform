@@ -12,7 +12,7 @@ const {
 
 const authServices = require("../controllers/authController");
 // This route is Authorized For Teacher
-// router.use(authServices.protect, authServices.allowedTo("teacher"));
+router.use(authServices.protect, authServices.allowedTo("teacher"));
 
 router.route("/").post(createResource).get(getAllResources);
 router
