@@ -5,12 +5,15 @@ const module_cohorte_association = require("../model/module_cohorte_association.
 const quizStudentModel = require("../model/quiz_student-association.model.js");
 const Module = require("../model/module.model.js");
 const Teacher = require("../model/teacher.model.js");
+
 const createQuiz = asyncHandler(async (req, res, next) => {
 	const { quizName, moduleId } = req.body;
 	const { duration, endTime } = req.body || null;
 	// check if the endTime is valid
 	const endDate = new Date(endTime);
-	if (endDate.getTime() < new Date().getTime() + duration) {
+	const currentTime = new Date();
+
+	if (endDate.getTime() < currentTime.getTime() + duration * 60000) {
 		return next(new ApiError(`Invalid End Time `, 400));
 	}
 	try {

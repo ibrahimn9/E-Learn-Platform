@@ -9,16 +9,16 @@ const setQuizIdToBody = (req, res, next) => {
 	next();
 };
 const addSingleQuestion = asyncHandler(async (req, res, next) => {
-	const { questionText, note, options, quiz } = req.body;
+	const { questionText, note, options, idQuiz } = req.body;
 	// 1-check if the quizId Is valid
-	const [[data]] = await Quiz.findById(quiz);
+	const [[data]] = await Quiz.findById(idQuiz);
 	if (!data) {
 		return next(new ApiError(`There is no Quiz For this Id `, 404));
 	}
 	let result;
 	// 2- Save the question To db
 	try {
-		const question = new Question(quiz, questionText, note);
+		const question = new Question(idQuiz, questionText, note);
 		[result] = await question.save();
 		// 2-save the options
 		await Promise.all(
@@ -39,8 +39,8 @@ const addSingleQuestion = asyncHandler(async (req, res, next) => {
 });
 
 const addMultipleQuestion = asyncHandler(async (req, res, next) => {
-	const { questions, options, quiz } = req.body;
-	const [[data]] = await Quiz.findById(quiz);
+	const { questions, options, idQuiz } = req.body;
+	const [[data]] = await Quiz.findById(idQuiz);
 	if (!data) {
 		return next(new ApiError(`There is no Quiz For this Id `, 404));
 	}
@@ -49,7 +49,7 @@ const addMultipleQuestion = asyncHandler(async (req, res, next) => {
 	try {
 		await Promise.all(
 			questions.map(async (data, index) => {
-				const question = new Question(quiz, data.text, data.note);
+				const question = new Question(idQuiz, data.text, data.note);
 				[result] = await question.save();
 				try {
 					options[index].map(async (item) => {

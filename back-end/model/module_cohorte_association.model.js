@@ -22,7 +22,7 @@ class ModuleCohorteAssociation {
 	}
 	static getStudentIds(idModule) {
 		return db.execute(
-			"SELECT st.id FROM module_cohorte_association AS moCohort LEFT JOIN students AS st ON st.idGroupe=moCohort.idCohorte WHERE moCohort.idModule = ? ",
+			"SELECT st.id FROM module_cohorte_association AS moCohort LEFT JOIN students AS st ON st.idCohorte=moCohort.idCohorte WHERE moCohort.idModule = ? ",
 			[idModule]
 		);
 	}
