@@ -17,13 +17,15 @@ class Class {
   static fetchById(id) {
     return db.execute("SELECT * FROM classes WHERE id = ?", [id]);
   }
-  static findByName(name, specialty) {
+  static findByName(name, speciality) {
     // Check if groupeNumber is null or undefined, and set it to NULL if it is
-    specialty = specialty || null;
+    speciality = speciality || null;
     name = name || null;
-    return db.execute("SELECT * FROM classes", [
+    return db.execute("SELECT * FROM classes where (name=? or ? IS NULL) and (speciality=? OR ? IS NULL)  ", [
       name,
-      specialty,
+      name,
+      speciality,
+      speciality
     ]);
   }
   static updateSpecialty(specialty, id) {

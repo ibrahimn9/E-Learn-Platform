@@ -12,7 +12,7 @@ const {
 
 const authServices = require("../controllers/authController");
 // This route is Authorized For Admin
-router.use(authServices.protect);
+
 
 router.post("/upload", uploadMooc);
 router.get("/", getAllMooc);

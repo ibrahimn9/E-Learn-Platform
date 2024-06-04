@@ -5,7 +5,6 @@ const {documentValidator} =  require("../utils/validator/documentValidator");
 const router = express.Router();
 const { upload } = require("../middlewares/multer");
 
-router.use(authServices.protect, authServices.allowedTo("teacher"));
 // /api/v1/teacher/document/insert-new-document/:chapterId
 router.post('/insert-new-document/:chapterId',upload.single("file"),documentValidator,addNewDocument);
 // /api/v1/teacher/document/:documentId

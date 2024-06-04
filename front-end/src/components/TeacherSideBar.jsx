@@ -8,6 +8,7 @@ import { BsFolderSymlinkFill } from "react-icons/bs";
 import { MdWorkHistory } from "react-icons/md";
 import { HiUserGroup } from "react-icons/hi2";
 import { IoLogOut } from "react-icons/io5";
+import { MdQuiz } from "react-icons/md";
 
 import { useStateContext } from "../context/StateContext";
 import { IoClose } from "react-icons/io5";
@@ -39,7 +40,15 @@ const TeacherSideBar = () => {
       icon: <BsFolderSymlinkFill />,
       route: `/teacher/${userData.userData?.id}/resource-management`,
     },
-    { name: "Homework", icon: <MdWorkHistory /> },
+    {
+      name: "Homework",
+      icon: <MdWorkHistory />,
+    },
+    {
+      name: "Quiz",
+      icon: <MdQuiz />,
+      route: `/teacher/${userData.userData?.id}/quiz-management`,
+    },
     { name: "Chats", icon: <HiUserGroup /> },
   ];
 

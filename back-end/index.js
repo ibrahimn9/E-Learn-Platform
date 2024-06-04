@@ -24,22 +24,17 @@ const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
 const PORT = process.env.PORT;
 const app = express();
-const session = require("express-session");
+
 
 // Serve static files from the public directory
-app.use(
-	session({
-		secret: process.env.SESSION_SECRET_KEY,
-		saveUninitialized: false,
-		resave: false,
-	})
-);
+
+
 app.use(cors());
 app.use(
-	cors({
-		origin: "http://localhost:5173", // Update with your client's origin
-		credentials: true,
-	})
+  cors({
+    origin: "http://localhost:5173", // Update with your client's origin
+    credentials: true,
+  })
 );
 
 app.set("view engine", "ejs");
@@ -49,8 +44,8 @@ app.use(cookieParser());
 
 //set express view engine
 if (process.env.NODE_ENV === "development") {
-	app.use(morgan("dev"));
-	console.log(`mode: ${process.env.NODE_ENV}`);
+  app.use(morgan("dev"));
+  console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
 app.use("/api/v1/auth", routerAuth);
@@ -70,7 +65,7 @@ app.use("/api/v1/quiz", quizRoute);
 app.use("/api/v1/result", resultRoute);
 // For Unmounted Url
 app.all("*", (req, res, next) => {
-	next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
+  next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
 });
 
 // Global error handling middleware for express
@@ -78,22 +73,22 @@ app.use(globalError);
 
 const server = http.createServer(app);
 server.listen(PORT, async () => {
-	try {
-		await pool.execute("SELECT 1");
-		console.log(`Connected To Database `);
-		console.log(`Server is Listening on PORT ${PORT}`);
-	} catch (error) {
-		console.log(error);
-	}
+  try {
+    await pool.execute("SELECT 1");
+    console.log(`Connected To Database `);
+    console.log(`Server is Listening on PORT ${PORT}`);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // Event => list =>callback(err)
 // Handle rejection outside express
 process.on("unhandledRejection", (err) => {
-	console.error(`UnhandledRejection Errors: ${err.name} | ${err.message}`);
-	// just in case of the current request
-	server.close(() => {
-		console.error(`Shutting down....`);
-		process.exit(1);
-	});
+  console.error(`UnhandledRejection Errors: ${err.name} | ${err.message}`);
+  // just in case of the current request
+  server.close(() => {
+    console.error(`Shutting down....`);
+    process.exit(1);
+  });
 });
