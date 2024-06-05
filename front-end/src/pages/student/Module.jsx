@@ -4,6 +4,7 @@ import {
   StudentSideBar,
   MoocDetail,
   ResourceDetail,
+  QuizDetail,
 } from "../../components";
 import { useStateContext } from "../../context/StateContext";
 import images from "../../constants/images";
@@ -15,6 +16,7 @@ import { CourseSideBar, DocumentDetails } from "../../components";
 import module from "../../services/module";
 import mooc from "../../services/mooc";
 import resource from "../../services/resource";
+import quiz from "../../services/quiz";
 
 const Module = () => {
   // fetch modules
@@ -35,6 +37,9 @@ const Module = () => {
 
     const resourcesRes = await resource.getResourcesByModule(id);
     moduleData.resources = resourcesRes.data.data;
+
+    const quizRes = await quiz.getQuizByModule(id)
+    moduleData.quiz = quizRes.data
 
     setModuleData(moduleData);
   };
@@ -79,6 +84,9 @@ const Module = () => {
             )}
             {selectedItem === "Resources" && (
               <ResourceDetail resources={moduleData?.resources} />
+            )}
+            {selectedItem === "Quiz" && (
+              <QuizDetail quiz={moduleData.quiz} />
             )}
           </div>
         </div>

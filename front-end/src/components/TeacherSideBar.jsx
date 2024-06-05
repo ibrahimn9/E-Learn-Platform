@@ -49,7 +49,6 @@ const TeacherSideBar = () => {
       icon: <MdQuiz />,
       route: `/teacher/${userData.userData?.id}/quiz-management`,
     },
-    { name: "Chats", icon: <HiUserGroup /> },
   ];
 
   const navigate = useNavigate();

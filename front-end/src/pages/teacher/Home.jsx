@@ -12,7 +12,7 @@ const Home = () => {
   const { userData } = useStateContext();
 
   return (
-    <div className="relative pb-10 bg-[#EFF5FF] w-full overflow-hidden">
+    <div className="relative pb-10 bg-[#EFF5FF] w-full overflow-hidden min-h-screen">
       <TeacherSideBar />
       <div className="relative sm:ml-[200px] md:ml-[260px]">
         <TeacherNav />
@@ -80,25 +80,15 @@ const Home = () => {
               </div>
               <div className="mt-10">
                 <p className="text-gray font-medium">
-                  Create communication space
-                </p>
-                <div className="cursor-pointer mt-3 bg-white rounded-md flex px-10 py-3 items-center justify-between">
-                  <div className="flex items-center gap-4 text-primary text-lg">
-                    <HiOutlineUserGroup className="text-[28px] font-bold" />
-                    <p>Add Community</p>
-                  </div>
-                  <button className="flex justify-center w-20 py-1 bg-blueState border border-blueState  text-white rounded-md font-semibold hover:opacity-[0.8]">
-                    Add
-                  </button>
-                </div>
-              </div>
-              <div className="mt-10">
-                <p className="text-gray font-medium">
                   Insert Learning Activities
                 </p>
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="bg-white cursor-pointer text-primary rounded-[3px] overflow-hidden top-border flex p-4 md:justify-center items-center gap-10">
-                    <div className="flex flex-col items-start gap-4">
+                    <div onClick={() =>
+                    navigate(
+                      `/teacher/${userData.userData?.id}/quiz-management`
+                    )
+                  } className="flex flex-col items-start gap-4">
                       <p>Add Quiz</p>
                       <p className="text-gray text-sm">
                         Create a small quiz for your students to evaluate their

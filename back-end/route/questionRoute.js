@@ -9,6 +9,7 @@ const {
 	getQuestionsQuiz,
 	updateQuestion,
 	deleteQuestion,
+	getQuestionsQuizStudent
 } = require("../controllers/questionController");
 
 const authServices = require("../controllers/authController");
@@ -39,5 +40,8 @@ router
 		authServices.allowedTo("teacher"),
 		deleteQuestion
 	);
+router
+    .route("/:idQuiz/student")
+	.get(getQuestionsQuizStudent)
 
 module.exports = router;

@@ -37,7 +37,10 @@ class Student {
     );
   }
   static findById(id) {
-    return db.execute("SELECT * FROM students WHERE `id` = ?", [id]);
+    return db.execute(
+      "SELECT students.fullname, students.email, students.idCohorte, cohorts.groupeNumber FROM students LEFT JOIN cohorts ON cohorts.id = students.idCohorte WHERE students.id = ?",
+      [id]
+    );
   }
   static updateUserVerified(isVerified, id) {
     return db.execute(

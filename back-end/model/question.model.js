@@ -31,7 +31,7 @@ class Question {
 	}
 	static findOptions(idQuestion) {
 		return db.execute(
-			"SELECT o.optionText , o.id FROM questions AS q LEFT JOIN options AS o ON o.questionId = q.id WHERE  q.id = ?",
+			"SELECT o.optionText , o.id, o.isCorrect FROM questions AS q LEFT JOIN options AS o ON o.questionId = q.id WHERE  q.id = ?",
 			[idQuestion]
 		);
 	}

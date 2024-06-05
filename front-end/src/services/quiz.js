@@ -20,6 +20,8 @@ const getQuestionsByQuiz = async (idQuiz) => {
   });
 };
 
+
+
 export default {
   getQuizByModule,
   createQuiz,

@@ -149,7 +149,7 @@ const MoocManagement = () => {
                 {module.moocs.map((mooc, index) => (
                   <div
                     key={index}
-                    className="p-4 bg-white rounded-md shadow-md"
+                    className="p-4 bg-white rounded-md shadow-md flex flex-col justify-between"
                   >
                     <div className="relative">
                       <img src={images.mooc} className="w-full" alt="mooc" />

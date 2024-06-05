@@ -66,6 +66,12 @@ class Quiz {
 			[id]
 		);
 	}
+	static getUsersResults1(id, id1) {
+		return db.execute(
+			"SELECT s.fullName AS StudentName , r.score ,q.quizName ,q.id AS QuizId  FROM quizzes AS q LEFT JOIN modules AS m ON m.id = q.moduleId LEFT JOIN teachers AS t ON t.id = q.teacherId LEFT JOIN results AS r ON q.id = r.quizId LEFT JOIN students AS s ON s.id = r.studentId  WHERE s.id= ? AND q.moduleId = ? ORDER BY r.score DESC",
+			[id1, id]
+		);
+	}
 }
 
 module.exports = Quiz;

@@ -24,18 +24,17 @@ router.use(
 );
 router
 	.route("/")
-	.post(authServices.protect, authServices.allowedTo("teacher"), createQuiz)
+	.post(authServices.protect, createQuiz)
 	.get(searchQuiz);
 router.get("/student", getStudentQuiz);
 router
 	.route("/:quizId")
 	.get(getQuizById)
-	.put(authServices.protect, authServices.allowedTo("teacher"), editQuiz)
+	.put(authServices.protect, editQuiz)
 	.delete(authServices.protect, authServices.allowedTo("teacher"), deleteQuiz);
 router.get(
 	"/module/:moduleId",
 	authServices.protect,
-	authServices.allowedTo("teacher"),
 	fetchQuizByModule
 );
 router.get(

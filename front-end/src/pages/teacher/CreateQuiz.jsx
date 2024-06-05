@@ -13,15 +13,18 @@ import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { IoCheckbox } from "react-icons/io5";
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const CreateQuiz = () => {
   const { setSelectedItem } = useStateContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setSelectedItem(5);
   }, []);
 
   const { userData } = useStateContext();
+
   const { refetchTModules, setRefetchTModules } = useStateContext();
   const { id } = useParams();
 
@@ -87,13 +90,26 @@ const CreateQuiz = () => {
     }
   };
 
+  //fetch quiz's questions
+  const [questionsData, setQuestionsData] = useState();
+  const [refetchQuestions, setRefetchQuestions] = useState(false);
+  const getQuizQuestions = async (quizId) => {
+    const res = await quiz.getQuestionsByQuiz(quizId);
+    setQuestionsData(res.data);
+  };
+
   // consult
   const [showConsultModal, setShowConsultModal] = useState(false);
   const [quizData, setQuizData] = useState("");
 
   const handleConsultClick = (quiz) => {
     setQuizData(quiz);
+    getQuizQuestions(quiz.id);
     setShowConsultModal(true);
+  };
+
+  const handleCloseConsultModal = () => {
+    setShowConsultModal(false);
   };
 
   // add question
@@ -132,7 +148,30 @@ const CreateQuiz = () => {
         setQuestionText("");
         setNote("");
         setOptions([{ text: "", isCorrect: false }]);
+        getQuizQuestions(quizData.id);
       }
+    } catch (error) {
+      if (error.response) {
+        setErrorMsg(error.response.data.msg);
+      }
+    }
+  };
+
+  // delete question
+
+  const handleDeleteQuestion = async (questionId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this question?"
+    );
+    if (!confirmed) {
+      return;
+    }
+    setErrorMsg("");
+    setSuccessMsg("");
+    try {
+      await question.deleteQuestion(questionId);
+      getQuizQuestions(quizData.id);
+      setSuccessMsg("Question deleted successfully");
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.msg);
@@ -163,7 +202,6 @@ const CreateQuiz = () => {
                   >
                     <p className="pt-2 font-medium text-xl">{quiz.quizName}</p>
                     <div className="py-2">
-                      <p className="text-gray text-sm">Questions: 15</p>
                       <div className="flex w-full items-center justify-between">
                         <p className="text-gray text-sm">
                           Deadline:{" "}
@@ -181,7 +219,14 @@ const CreateQuiz = () => {
                       >
                         Consult
                       </button>
-                      <button className="basis-[45%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState  text-white rounded-md font-medium hover:opacity-[0.8]">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `${quiz.id}`
+                          )
+                        }
+                        className="basis-[45%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState  text-white rounded-md font-medium hover:opacity-[0.8]"
+                      >
                         Student results
                       </button>
                     </div>
@@ -299,6 +344,22 @@ const CreateQuiz = () => {
             <h2 className="text-2xl font-bold text-primary mb-4">
               {quizData.quizName}
             </h2>
+            {errorMsg && (
+              <div
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative my-2 w-full"
+                role="alert"
+              >
+                <span className="block sm:inline text-sm">{errorMsg}</span>
+              </div>
+            )}
+            {successMsg && (
+              <div
+                className="bg-green-100 w-full border border-green-400 text-green-700 px-4 py-2 rounded relative my-2"
+                role="alert"
+              >
+                <span className="block sm:inline text-sm">{successMsg}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-darkGray text-lg font-medium">Questions</h4>
               <button
@@ -318,24 +379,7 @@ const CreateQuiz = () => {
                 <h2 className="text-xl font-medium text-darkGray mb-2">
                   Add Question
                 </h2>
-                {errorMsg && (
-                  <div
-                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative my-2 w-full"
-                    role="alert"
-                  >
-                    <span className="block sm:inline text-sm">{errorMsg}</span>
-                  </div>
-                )}
-                {successMsg && (
-                  <div
-                    className="bg-green-100 w-full border border-green-400 text-green-700 px-4 py-2 rounded relative my-2"
-                    role="alert"
-                  >
-                    <span className="block sm:inline text-sm">
-                      {successMsg}
-                    </span>
-                  </div>
-                )}
+
                 <div className="mb-4">
                   <label
                     htmlFor="questionText"
@@ -419,26 +463,48 @@ const CreateQuiz = () => {
             )}
 
             <div className="px-4 mt-8">
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-darkGray text-md font-medium">Q1</h4>
-                  <div className="flex items-center gap-4 text-xl text-darkGray">
-                    <MdEdit className="cursor-pointer" />
-                    <MdDelete className="cursor-pointer" />
+              {questionsData?.questions.map((question, index) => (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-darkGray text-md font-medium">
+                      Q{index + 1}
+                    </h4>
+                    <div className="flex items-center gap-4 text-xl text-darkGray">
+                      <MdDelete
+                        onClick={() => handleDeleteQuestion(question.id)}
+                        className="cursor-pointer"
+                      />
+                    </div>
                   </div>
+                  <h4 className="text-darkGray text-md font-medium">
+                    {question.questionText}
+                  </h4>
+                  {question.options.map((option, index) => {
+                    if (option.isCorrect === 1)
+                      return (
+                        <div className="w-[80%] border border-green-400 bg-green-50 rounded-md py-2 px-2 mt-2 flex items-center gap-2">
+                          <IoCheckbox className="mt-[3px] text-[24px] text-green-400 cursor-pointer" />
+                          <p className="text-darkGray">{option.optionText}</p>
+                        </div>
+                      );
+                    else
+                      return (
+                        <div className="w-[80%] border border-gray4 rounded-md py-2 px-2 mt-2 flex items-center gap-2">
+                          <MdOutlineCheckBoxOutlineBlank className="mt-[3px] text-[24px] text-gray4 cursor-pointer" />
+                          <p className="text-darkGray">{option.optionText}</p>
+                        </div>
+                      );
+                  })}
                 </div>
-                <h4 className="text-darkGray text-md font-medium">
-                  Wich of the following is not is not a networking protocol?
-                </h4>
-                <div className="w-[80%] border border-gray4 rounded-md py-2 px-2 mt-2 flex items-center gap-2">
-                  <MdOutlineCheckBoxOutlineBlank className="mt-[3px] text-[24px] text-gray4 cursor-pointer" />
-                  <p className="text-darkGray">a. ICP</p>
-                </div>
-                <div className="w-[80%] border border-green-400 bg-green-50 rounded-md py-2 px-2 mt-2 flex items-center gap-2">
-                  <IoCheckbox className="mt-[3px] text-[24px] text-green-400 cursor-pointer" />
-                  <p className="text-darkGray">a. ICP</p>
-                </div>
-              </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-end">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold hover:opacity-80"
+                onClick={handleCloseConsultModal}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
