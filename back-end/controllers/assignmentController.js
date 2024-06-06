@@ -84,6 +84,12 @@ const getAssignments = asyncHandler(async (req, res, next) => {
   const [result] = await Assignment.fetchAll(teacherId, moduleId);
   res.status(200).json({ data: result });
 });
+
+const getStudentAssignments = asyncHandler(async (req, res, next) => {
+  const { moduleId } = req.params;
+  const [result] = await Assignment.getAll(moduleId);
+  res.status(200).json({ data: result });
+});
 const getAssignmentFile = asyncHandler(async (req, res, next) => {
   try {
     const fileId = req.params.fileId;
@@ -107,4 +113,5 @@ module.exports = {
   getAssignments,
   updateAssignment,
   deleteAssignment,
+  getStudentAssignments
 };

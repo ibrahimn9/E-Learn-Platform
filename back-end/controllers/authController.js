@@ -212,7 +212,7 @@ const protect = asyncHandler(async (req, res, next) => {
 		);
 	}
 	req.role = role;
-	req.user = user[0][0];
+	req.user = await user[0][0];
 	next();
 });
 

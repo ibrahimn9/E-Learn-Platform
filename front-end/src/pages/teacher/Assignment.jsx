@@ -91,7 +91,6 @@ const Assignment = () => {
     }
   };
 
-
   return (
     <div className="relative min-h-screen pb-10 bg-[#EFF5FF] w-full overflow-hidden">
       <TeacherSideBar />
@@ -131,7 +130,10 @@ const Assignment = () => {
                       >
                         Consult
                       </a>
-                      <button className="basis-[45%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState  text-white rounded-md font-medium hover:opacity-[0.8]">
+                      <button
+                        onClick={() => navigate(`${assignment.id}`)}
+                        className="basis-[45%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState  text-white rounded-md font-medium hover:opacity-[0.8]"
+                      >
                         Student Answers
                       </button>
                     </div>

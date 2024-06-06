@@ -12,16 +12,30 @@ class Assignment {
   save() {
     return db.execute(
       `INSERT INTO assignments (name,description,teacherId,moduleId,timeEnd,uploadedLink) VALUES (?,?,?,?,COALESCE(?, timeEnd),?)`,
-      [this.name, this.description, this.teacherId, this.moduleId, this.timeEnd, this.uploadedLink]
+      [
+        this.name,
+        this.description,
+        this.teacherId,
+        this.moduleId,
+        this.timeEnd,
+        this.uploadedLink,
+      ]
     );
   }
   static fetchAll(teacherId, moduleId) {
     teacherId = teacherId || null;
     moduleId = moduleId || null;
     return db.execute(
-      "SELECT ass.name ,ass.description ,ass.timeEnd,ass.timeBegin,ass.uploadedLink, modules.name AS ModuleName ,modules.semester,teachers.fullName AS TeacherName FROM assignments AS ass LEFT JOIN modules ON ass.moduleId =modules.id  LEFT JOIN teachers ON  teachers.id = ass.teacherId  WHERE  (ass.teacherId  LIKE ? OR ? IS NULL) AND (ass.moduleId = ? OR ? IS NULL)",
+      "SELECT ass.id, ass.name ,ass.description ,ass.timeEnd,ass.timeBegin,ass.uploadedLink, modules.name AS ModuleName ,modules.semester,teachers.fullName AS TeacherName FROM assignments AS ass LEFT JOIN modules ON ass.moduleId =modules.id  LEFT JOIN teachers ON  teachers.id = ass.teacherId  WHERE  (ass.teacherId  LIKE ? OR ? IS NULL) AND (ass.moduleId = ? OR ? IS NULL)",
       [teacherId, teacherId, moduleId, moduleId]
     );
+  }
+
+  static getAll(moduleId) {
+    moduleId = moduleId || null;
+    return db.execute("SELECT * FROM assignments WHERE moduleId = ?", [
+      moduleId,
+    ]);
   }
 
   static findById(id) {

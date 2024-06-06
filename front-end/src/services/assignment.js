@@ -18,7 +18,31 @@ const create = async (formData) => {
   });
 };
 
+const getStudentAssignments = async (moduleId) => {
+  return axios.get(`${baseUrl}/module/${moduleId}`, {
+    withCredentials: true,
+  });
+};
+
+const submit = async (formData, assignmentId) => {
+  return await axios.post(`${baseUrl}/${assignmentId}/submission`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    withCredentials: true,
+  });
+};
+
+const evaluateSubmission = async (assignmentId, body) => {
+  return await axios.post(`${baseUrl}/${assignmentId}/evaluation`, body, {
+    withCredentials: true,
+  });
+};
+
 export default {
   getAll,
-  create
+  create,
+  getStudentAssignments,
+  submit,
+  evaluateSubmission,
 };

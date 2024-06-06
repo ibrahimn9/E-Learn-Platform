@@ -38,7 +38,7 @@ class Student {
   }
   static findById(id) {
     return db.execute(
-      "SELECT students.fullname, students.email, students.idCohorte, cohorts.groupeNumber FROM students LEFT JOIN cohorts ON cohorts.id = students.idCohorte WHERE students.id = ?",
+      "SELECT students.id, students.fullname, students.email, students.idCohorte, cohorts.groupeNumber FROM students LEFT JOIN cohorts ON cohorts.id = students.idCohorte WHERE students.id = ?",
       [id]
     );
   }

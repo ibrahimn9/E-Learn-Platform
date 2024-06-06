@@ -8,6 +8,7 @@ const {
     deleteAssignment,
     updateAssignment,
     getAssignments,
+    getStudentAssignments
 } = require("../controllers/assignmentController");
 const submissionRoute = require("./submissionRoute");
 const evaluationRoute = require("./evaluationRoute");
@@ -15,13 +16,12 @@ const authServices = require("../controllers/authController");
 router.use(
     "/:assignmentId/submission",
     authServices.protect,
-    authServices.allowedTo("student"),
     submissionRoute
 );
-router.use("/:assignmentId/evaluation", evaluationRoute);
-router.get("/file/:fileId", getAssignmentFile);
+router.use("/:assignmentId/evaluation",authServices.protect, evaluationRoute);
+router.get("/file/:fileId",authServices.protect, getAssignmentFile);
 // This route is Authorized For Admin
-router.use(authServices.protect, authServices.allowedTo("teacher"));
+
 
 router
     .route("/")
@@ -32,4 +32,7 @@ router
     .get(getAssignment)
     .delete(deleteAssignment)
     .put(updateAssignment);
+router
+    .route("/module/:moduleId")
+    .get(getStudentAssignments)
 module.exports = router;

@@ -5,6 +5,7 @@ import {
   MoocDetail,
   ResourceDetail,
   QuizDetail,
+  AssignmentDetail,
 } from "../../components";
 import { useStateContext } from "../../context/StateContext";
 import images from "../../constants/images";
@@ -17,6 +18,7 @@ import module from "../../services/module";
 import mooc from "../../services/mooc";
 import resource from "../../services/resource";
 import quiz from "../../services/quiz";
+import assignment from "../../services/assignment";
 
 const Module = () => {
   // fetch modules
@@ -38,15 +40,19 @@ const Module = () => {
     const resourcesRes = await resource.getResourcesByModule(id);
     moduleData.resources = resourcesRes.data.data;
 
-    const quizRes = await quiz.getQuizByModule(id)
-    moduleData.quiz = quizRes.data
+    const quizRes = await quiz.getQuizByModule(id);
+    moduleData.quiz = quizRes.data;
+
+    const assignmentRes = await assignment.getStudentAssignments(id);
+    moduleData.assignments = assignmentRes.data.data;
 
     setModuleData(moduleData);
   };
 
+
   const [selectedItem, setSelectedItem] = useState("Documents page");
 
-  const items = ["Documents page", "MOOC", "Quiz", "Resources"];
+  const items = ["Documents page", "MOOC", "Quiz", "Assignment", "Resources"];
 
   useEffect(() => {
     fetchModule();
@@ -85,8 +91,9 @@ const Module = () => {
             {selectedItem === "Resources" && (
               <ResourceDetail resources={moduleData?.resources} />
             )}
-            {selectedItem === "Quiz" && (
-              <QuizDetail quiz={moduleData.quiz} />
+            {selectedItem === "Quiz" && <QuizDetail quiz={moduleData.quiz} />}
+            {selectedItem === "Assignment" && (
+              <AssignmentDetail assignments={moduleData.assignments} />
             )}
           </div>
         </div>

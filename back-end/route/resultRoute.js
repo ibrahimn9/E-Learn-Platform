@@ -34,6 +34,7 @@ router.get(
   getUserResults
 );
 
-router.get("/quiz/:quizId/students", getPassedStudents);
+router.get("/quiz/:quizId/students",
+  authServices.protect, getPassedStudents);
 
 module.exports = router;

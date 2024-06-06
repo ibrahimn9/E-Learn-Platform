@@ -1,26 +1,35 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
-
+const { upload } = require("../middlewares/multer");
 const {
-	evaluateSubmission,
-	getAssignmentEvaluation,
-} = require("../controllers/evaluationController");
+  submitAssignment,
+  showUserSubmission,
+  showAssignmentSubmission,
+} = require("../controllers/submissionController");
 
 const authServices = require("../controllers/authController");
-// This route is Authorized For Admin
 
-router
-	.route("/")
-	.post(
-		authServices.protect,
-		authServices.allowedTo("teacher"),
-		evaluateSubmission
-	)
-	.get(
-		authServices.protect,
-		authServices.allowedTo("teacher"),
-		getAssignmentEvaluation
-	);
+// Routes for submitting assignments and viewing submissions
+router.post(
+  "/:assignmentId",
+  authServices.protect,
+  authServices.allowedTo("student"),
+  upload.single("file"),
+  submitAssignment
+);
 
-router.route("/:evaluationId").get().delete().put();
+router.get(
+  "/user",
+  authServices.protect,
+  authServices.allowedTo("student"),
+  showUserSubmission
+);
+
+router.get(
+  "/answers/:assignmentId",
+  authServices.protect,
+  authServices.allowedTo("teacher"),
+  showAssignmentSubmission
+);
+
 module.exports = router;

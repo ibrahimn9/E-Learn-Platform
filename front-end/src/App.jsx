@@ -6,7 +6,7 @@ import TeacherHome from "./pages/teacher/Home";
 import StudentHome from "./pages/student/Home";
 import { Teacher, Student, CreateCohort, CreateModules } from "./pages/admin";
 import CourseManagement from "./pages/teacher/CourseManagement";
-import { MoocManagement, Resource, CreateQuiz, QuizResults, Assignment } from "./pages/teacher";
+import { MoocManagement, Resource, CreateQuiz, QuizResults, Assignment, AssignmentAnswers } from "./pages/teacher";
 import { useStateContext } from "./context/StateContext";
 import Cookies from "js-cookie";
 import auth from "./services/auth";
@@ -59,6 +59,7 @@ const App = () => {
         <Route path="/teacher/:id/quiz-management" element={<CreateQuiz />} />
         <Route path="/teacher/:id/assignment-management" element={<Assignment />} />
         <Route path="/teacher/:id/quiz-management/:idQuiz" element={<QuizResults />} />
+        <Route path="/teacher/:id/assignment-management/:idAssignment" element={<AssignmentAnswers />} />
 
         <Route path="/student/:id" element={<StudentHome />} />
         <Route path="/student/:id/module/:id" element={<Module />} />
