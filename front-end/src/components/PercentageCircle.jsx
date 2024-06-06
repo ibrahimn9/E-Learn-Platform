@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const PercentageCircle = ({
   circleSize = 168,
-  percent = 67,
+  percent = 0,
   duration = 1000,
   offset = 100,
   fontColor = 'rgba(0,0,0,.5)',
@@ -50,8 +50,6 @@ const PercentageCircle = ({
     a ${radius} ${radius} 0 0 1 0 ${diameter}
     a ${radius} ${radius} 0 0 1 0 ${diameter * -1}
   `;
-
-  
 
   return (
     <div

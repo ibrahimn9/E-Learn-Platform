@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const Document = require("../model/document.model.js");
 const { uploadFile } = require("../utils/documentCloud.js");
 const fs = require("fs");
-
+const db = require("../config/database");
 /**-----------------------------------------------
  * @desc    insert new document
  * @route   /api/v1/teacher/document/insert-new-document/:chapterId
@@ -41,7 +41,23 @@ const deleteDocument = asyncHandler(async (req, res, next) => {
   res.status(203).json({ message: "document deleted" });
 });
 
+
+const getCount = asyncHandler(async (req, res, next) => {
+  try {
+    const [[documentsCount]] = await db.query("SELECT COUNT(*) as count FROM documents");
+    const [[resourcesCount]] = await db.query("SELECT COUNT(*) as count FROM resources");
+
+    res.status(200).json({
+      documentsCount: documentsCount.count,
+      resourcesCount: resourcesCount.count,
+    });
+  } catch (error) {
+    next(new ApiError("Failed to retrieve counts", 500));
+  }
+});
+
 module.exports = {
   addNewDocument,
   deleteDocument,
+  getCount
 };

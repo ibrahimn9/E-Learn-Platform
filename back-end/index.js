@@ -20,6 +20,8 @@ const resourceRoute = require("./route/resourceRoute.js");
 const questionRoute = require("./route/questionRoute.js");
 const resultRoute = require("./route/resultRoute");
 const quizRoute = require("./route/quizRoute.js");
+const submissionRoute = require("./route/submissionRoute.js");
+const assignmentRoute = require("./route/assignmentRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
 const PORT = process.env.PORT;
@@ -63,6 +65,10 @@ app.use("/api/v1/student", studentRoute);
 app.use("/api/v1/questions", questionRoute);
 app.use("/api/v1/quiz", quizRoute);
 app.use("/api/v1/result", resultRoute);
+app.use("/api/v1/assignment", assignmentRoute);
+app.use("/api/v1/submission", submissionRoute);
+
+
 // For Unmounted Url
 app.all("*", (req, res, next) => {
   next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));

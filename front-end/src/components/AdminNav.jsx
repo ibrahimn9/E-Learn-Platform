@@ -8,9 +8,8 @@ const AdminNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-
   const { userData } = useStateContext();
-  
+
   return (
     <nav className="bg-white shadow-md bg-opacity-98 sticky top-0 z-10">
       <div className=" mx-auto px-4">
@@ -20,9 +19,7 @@ const AdminNav = () => {
             {/* Logo */}
             <div className="flex-shrink-0">
               <img
-                onClick={() =>
-                  navigate(`/admin/${userData.userData.id}`)
-                }
+                onClick={() => navigate(`/admin/${userData.userData.id}`)}
                 className="h-10 w-auto cursor-pointer"
                 src={images.logo}
                 alt="Logo"
@@ -32,7 +29,7 @@ const AdminNav = () => {
           {/* Right side */}
           <div className="flex items-center">
             {/* Navbar Links */}
-           
+
             {/* User profile */}
             <IoMdNotificationsOutline className="ml-4 text-[25px] text-[#404040] cursor-pointer" />
             <div className="ml-4 relative flex-shrink-0">
@@ -43,14 +40,21 @@ const AdminNav = () => {
                 aria-label="User menu"
                 aria-haspopup="true"
               >
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src={images.userPic}
-                  alt="User profile"
-                />
+                <div className="h-10 w-10 rounded-full bg-gray4 flex justify-center items-center">
+                  {userData.userData?.fullname
+                    ? userData.userData?.fullname[0].toUpperCase()
+                    : userData.userData?.fullName[0].toUpperCase()}
+                  {userData.userData?.fullname
+                    ? userData.userData?.fullname.split(" ")[1][0].toUpperCase()
+                    : userData.userData?.fullName
+                        .split(" ")[1][0]
+                        .toUpperCase()}
+                </div>
                 <div className="px-4 py-2 text-sm text-gray-700 text-left">
                   <p className="font-semibold">{userData.userData?.fullName}</p>
-                  <p className="text-xs text-gray-500 capitalize">{userData?.role}</p>
+                  <p className="text-xs text-gray-500 capitalize">
+                    {userData?.role}
+                  </p>
                 </div>
               </button>
               {/* User Dropdown */}
@@ -63,8 +67,12 @@ const AdminNav = () => {
                     aria-labelledby="user-menu"
                   >
                     <div className="px-4 py-2 text-sm text-gray-700">
-                      <p className="font-semibold">{userData.userData?.fullName}</p>
-                      <p className="text-xs text-gray-500 capitalize">{userData?.role}</p>
+                      <p className="font-semibold">
+                        {userData.userData?.fullName}
+                      </p>
+                      <p className="text-xs text-gray-500 capitalize">
+                        {userData?.role}
+                      </p>
                     </div>
                     {/* Other dropdown items */}
                   </div>

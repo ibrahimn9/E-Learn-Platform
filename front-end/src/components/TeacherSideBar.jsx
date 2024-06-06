@@ -43,6 +43,7 @@ const TeacherSideBar = () => {
     {
       name: "Homework",
       icon: <MdWorkHistory />,
+      route: `/teacher/${userData.userData?.id}/assignment-management`,
     },
     {
       name: "Quiz",
