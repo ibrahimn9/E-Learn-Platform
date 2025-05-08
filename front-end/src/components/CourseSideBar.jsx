@@ -22,7 +22,7 @@ const CourseSideBar = ({ modules }) => {
 
   useEffect(() => {
     if (modules) {
-      const firstElementId = modules[0]?.chapters[0].id;
+      const firstElementId = modules[0]?.chapters[0]?.id;
       setVisibleDocuments((prevState) => ({
         ...prevState,
         [firstElementId]: true,
@@ -61,7 +61,7 @@ const CourseSideBar = ({ modules }) => {
                       <div className="flex items-center gap-2 mb-1 cursor-pointer">
                         <ImRadioUnchecked className="text-gray" />
                         <a
-                          href={doc.file}
+                          href={`http://localhost:3000/${doc.file}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >

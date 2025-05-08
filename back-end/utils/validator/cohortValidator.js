@@ -15,38 +15,7 @@ exports.createCohortValidator = [
   check("className")
     .notEmpty()
     .withMessage("should Be A class for Module")
-    .isIn([
-      "1CPI",
-      "2CPI",
-      "1CS",
-      "2CS",
-      "3CS",
-      "1cpi",
-      "2cpi",
-      "1cs",
-      "2cs",
-      "3cs",
-    ])
     .withMessage("invalid class"),
-  check("specialty")
-    .optional()
-    .custom((value, { req }) => {
-      if (
-        ![
-          "1CPI",
-          "2CPI",
-          "1CS",
-          "2CS",
-          "3CS",
-          "1cpi",
-          "2cpi",
-          "1cs",
-          "2cs",
-          "3cs",
-        ].includes(req.body.className)
-      )
-        throw new Error(`The ${value} Is in The Wrong Class `);
-      return true;
-    }),
+  check("specialty").optional(),
   validatorMiddleware,
 ];

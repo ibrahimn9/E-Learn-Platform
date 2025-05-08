@@ -38,7 +38,7 @@ router.post(
 // /api/v1/admin/delete-student/:id
 router.delete("/delete-student/:id", removeStudentById);
 // /api/v1/admin/delete-teacher/:id
-router.delete("/delete-teacher/:id", removeTeacherById);
+router.delete("/delete-teacherr/:id", removeTeacherById);
 // /api/v1/admin/delete-students/:id
 router.delete("/delete-students/:id", removeStudentsByClassId);
 // /api/v1/admin/insert-new-student

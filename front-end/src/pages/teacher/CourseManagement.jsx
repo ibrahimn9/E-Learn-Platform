@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 
 const CourseManagement = () => {
   const { userData } = useStateContext();
-  const {refetchTModules, setRefetchTModules} = useStateContext();
+  const { refetchTModules, setRefetchTModules } = useStateContext();
   const { id } = useParams();
 
   const [modules, setModules] = useState([]);
@@ -160,7 +160,7 @@ const CourseManagement = () => {
         <div className="px-2 md:px-6">
           {modules.map((module, ix) => (
             <div key={ix} className="mt-6 mb-[100px]">
-              <h1 className="text-2xl font-bold text-primary mb-4">
+              <h1 className="text-2xl font-bold text-primary mb-4 break-words">
                 {module.name}
               </h1>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ml-2">
@@ -179,7 +179,7 @@ const CourseManagement = () => {
                         >
                           <FaChevronRight />
                           <a
-                            href={doc.file}
+                            href={`http://localhost:3000/${doc.file}`}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -383,7 +383,7 @@ const CourseManagement = () => {
                 onClick={(e) => handleEdit(e)}
                 className="px-4 py-2 bg-blueState text-white rounded-md font-semibold hover:opacity-80"
               >
-                Edit
+                Add
               </button>
               <button
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold hover:opacity-80"

@@ -8,6 +8,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 const Home = () => {
   const { userData } = useStateContext();
+  console.log(userData)
   const { id } = useParams();
 
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Home = () => {
   const [modules, setModules] = useState([]);
 
   const fetchModules = async () => {
-    const res = await student.getModulesByStudentId("20");
+    const res = await student.getModulesByStudentId(id);
 
     const sortedModules = res.data.sort((a, b) => {
       if (a.semester === "S1" && b.semester === "S2") {

@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 
 const sendErrorForDev = (err, res) =>
 	res.status(400).json({

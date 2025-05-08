@@ -10,6 +10,8 @@ const AdminNav = () => {
 
   const { userData } = useStateContext();
 
+  console.log(userData);
+
   return (
     <nav className="bg-white shadow-md bg-opacity-98 sticky top-0 z-10">
       <div className=" mx-auto px-4">
@@ -41,14 +43,8 @@ const AdminNav = () => {
                 aria-haspopup="true"
               >
                 <div className="h-10 w-10 rounded-full bg-gray4 flex justify-center items-center">
-                  {userData.userData?.fullname
-                    ? userData.userData?.fullname[0].toUpperCase()
-                    : userData.userData?.fullName[0].toUpperCase()}
-                  {userData.userData?.fullname
-                    ? userData.userData?.fullname.split(" ")[1][0].toUpperCase()
-                    : userData.userData?.fullName
-                        .split(" ")[1][0]
-                        .toUpperCase()}
+                  {userData.userData?.fullName[0].toUpperCase()}{" "}
+                  {userData.userData?.fullName[1].toUpperCase()}
                 </div>
                 <div className="px-4 py-2 text-sm text-gray-700 text-left">
                   <p className="font-semibold">{userData.userData?.fullName}</p>

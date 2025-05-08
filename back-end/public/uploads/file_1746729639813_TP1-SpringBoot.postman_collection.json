@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "d04ee294-6195-43ad-800a-0c0ae419d678",
+		"name": "TP1-SpringBoot",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15255541"
+	},
+	"item": [
+		{
+			"name": "VMs by IdServeur",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/rsu/serveur/1/vms",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"rsu",
+						"serveur",
+						"1",
+						"vms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add VM",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n   \"idUtilisateur\":\"1\",    \r\n    \"idServeur\":\"2\",\r\n    \"idServeurBackup\" :\"1\" ,   \r\n     \"configuration\":{\r\n           \"cpu\":\"2\",   \"ram\":\"16\", \"disk\":\"100\"\r\n                       }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/rsu/vm",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"rsu",
+						"vm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update User with Put",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nom\": \"sami\" ,\r\n    \"email\":\"a.smail@esi-sba.dz\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/rsu/user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"rsu",
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update User with Path",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \r\n    \"email\":\"a.smail@esi-sba.dz\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/rsu/user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"rsu",
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete VM from Server",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/rsu/serveur/1/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"rsu",
+						"serveur",
+						"1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -18,7 +18,7 @@ const insertTeachers = async (formData) => {
 };
 
 const deleteTeacherById = async (id) => {
-  return axios.delete(`${baseUrl}/delete-teacher/${id}`, {
+  return axios.delete(`${baseUrl}/delete-teacherr/${id}`, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

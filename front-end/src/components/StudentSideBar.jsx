@@ -14,9 +14,16 @@ import { IoClose } from "react-icons/io5";
 
 import { useNavigate } from "react-router-dom";
 
+import Cookies from "js-cookie";
+
 const StudentSideBar = () => {
   const { selectedItem, setSelectedItem } = useStateContext();
   const { userData } = useStateContext();
+
+  const logOut = () => {
+    Cookies.set("access_token", "");
+    navigate(`/auth`);
+  };
 
   const sideBarItems = [
     {
@@ -25,7 +32,6 @@ const StudentSideBar = () => {
       route: `/student/${userData.userData?.id}`,
     },
     { name: "Assignments", icon: <MdWorkHistory /> },
-    { name: "Chats", icon: <HiUserGroup /> },
   ];
 
   const navigate = useNavigate();
@@ -53,7 +59,10 @@ const StudentSideBar = () => {
           </div>
         ))}
       </div>
-      <div className="py-2 mt-[30vh] flex items-center justify-center rounded-md gap-3 text-md cursor-pointer font-medium text-gray4">
+      <div
+        onClick={() => logOut()}
+        className="py-2 mt-[30vh] flex items-center justify-center rounded-md gap-3 text-md cursor-pointer font-medium text-gray4"
+      >
         <div>
           <IoLogOut />
         </div>

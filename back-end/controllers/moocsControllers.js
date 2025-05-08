@@ -10,6 +10,7 @@ const ffmpegStatic = require("ffmpeg-static");
 const ffmpeg = require("fluent-ffmpeg");
 const Mooc = require("../model/mooc.model");
 const Module = require("../model/module.model");
+require('dotenv').config();
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 ffmpeg.setFfmpegPath(ffmpegStatic);
@@ -27,112 +28,62 @@ const upload = multer({
 	storage: multer.memoryStorage(),
 }).single("mooc");
 
-const  	uploadMooc = asyncHandler(async (req, res, next) => {
+const uploadMooc = asyncHandler(async (req, res, next) => {
 	upload(req, res, async function (err) {
 		try {
 			if (err) {
-				next(
-					new ApiError(
-						"Error uploading document. Make sure it is a video file.",
-						403
-					)
-				);
-			} else {
-				// Check If The Teacher is The Editor Of This Module
-				// const [[editor]] = await Module.getEditorId(req.body.idModule);
-				// if (editor.idEditor !== req.user.id) {
-				// 	return next(
-				// 		new ApiError("You Aren't Allowed To perform This Action ", 403)
-				// 	);
-				// }
-				const { videoTitle, videoDescription } = req.body;
-				if (!videoDescription || !videoTitle) {
-					return next(
-						new ApiError("Video Title Or Description Is missed ", 400)
-					);
-				}
-				// Validate The Input
-				const inputBuffer = req.file.buffer;
-				//save buffer to file
-				const inputFileExtension = path.extname(req.file.originalname);
-				const inputFile = `input-${uuidv4()}-${Date.now()}-${inputFileExtension}`;
-				fs.writeFileSync(`./public/videos/${inputFile}`, inputBuffer);
-				// 1- generate thumbnail image
-				imageInput = `${inputFile}.png`;
-
-				ffmpeg(`./public/videos/${inputFile}`)
-					.screenshots({
-						timestamps: ["10%"],
-						folder: "./public/img",
-						filename: imageInput,
-						size: "720x?",
-					})
-					.on("error", function (err) {
-						console.error(`this ${err}`);
-					});
-
-				// 2- compress video
-				ffmpeg(`./public/videos/${inputFile}`)
-					.output(req.file.originalname)
-					.videoCodec("libx264")
-					.audioCodec("libmp3lame")
-					.size("720x?")
-					.on("error", (err) => {
-						console.log("Error:", err.message);
-					})
-					.on("end", async function () {
-						const imageFilePath = `./public/img/${imageInput}`;
-						const response = await uploadVideoToUpStreamApi(
-							process.env.UPSTREAM_API_KEY,
-							`./public/videos/${inputFile}`,
-							videoTitle,
-							videoDescription,
-							imageFilePath,
-							req.file.originalname
-						);
-						if (response instanceof Error) {
-							return next(
-								new ApiError(
-									`The Upload Can't Finish Your Internet Isn't Working`,
-									500
-								)
-							);
-						}
-						fs.unlinkSync(imageFilePath);
-						fs.unlinkSync(`./public/videos/${inputFile}`);
-						fs.unlinkSync(req.file.originalname);
-						const mooc = new Mooc(
-							videoTitle,
-							videoDescription,
-							`https://upstream.to/embed-${response.files[0].filecode}.html`,
-							req.body.idModule
-						);
-						mooc.save();
-						res.json({
-							data: response,
-						});
-					})
-					.run();
+				return next(new ApiError("Erreur d'upload. Assurez-vous que c'est une vidéo.", 403));
 			}
-		} catch (error) {
-			return next(
-				new ApiError(
-					"Something went wrong while uploading..." + error.message,
-					500
-				)
+
+			const { videoTitle, videoDescription, idModule } = req.body;
+			if (!videoTitle || !videoDescription || !idModule) {
+				return next(new ApiError("Title, description ou idModule manquant.", 400));
+			}
+
+			// Get file buffer and extension
+			const inputBuffer = req.file.buffer;
+			const inputFileExtension = path.extname(req.file.originalname);
+			const videoFileName = `mooc-${uuidv4()}${inputFileExtension}`;
+			const videoFilePath = `./public/videos/${videoFileName}`;
+			const videoUrl = `/videos/${videoFileName}`; // This is what will be saved in DB
+
+			// Save video to public/videos
+			fs.writeFileSync(videoFilePath, inputBuffer);
+
+			// Optional: generate thumbnail
+			const imageFileName = `${videoFileName}.png`;
+			const imagePath = `./public/img/${imageFileName}`;
+
+			ffmpeg(videoFilePath)
+				.screenshots({
+					timestamps: ["10%"],
+					filename: imageFileName,
+					folder: "./public/img",
+					size: "720x?"
+				})
+				.on("error", (err) => {
+					console.error("Erreur thumbnail :", err.message);
+				});
+
+			// Save to DB
+			const mooc = new Mooc(
+				videoTitle,
+				videoDescription,
+				videoUrl, // this is the local URL
+				idModule
 			);
-			// if (imageFilePath) {
-			// 	fs.unlinkSync(imageFilePath);
-			// 	if (inputFile) {
-			// 		fs.unlinkSync(`./public/videos/${inputFile}`);
-			// 		if (req.file.originalname) {
-			// 			fs.unlinkSync(req.file.originalname);
-			// 		}
-			// 	}
-			// }
+			await mooc.save();
+
+			res.status(201).json({
+				message: "Vidéo enregistrée avec succès",
+				videoUrl,
+			});
+		} catch (error) {
+			return next(new ApiError("Erreur serveur : " + error.message, 500));
 		}
 	});
 });
+
 
 async function uploadVideoToUpStreamApi(
 	apiKey,

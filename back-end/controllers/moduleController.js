@@ -101,9 +101,7 @@ const createModule = asyncHandler(async (req, res, next) => {
   let classesIds = req.body.classes;
 
   const { teachers } = req.body;
-  if (!teachers.includes(dataTeacher.id)) {
-    return next(new ApiError(`The Editor Must Include In Teachers`, 400));
-  }
+
   // get the body data and insert new record in database
   const { name, description, semester } = req.body;
   const newModule = new Module(name, semester, description, dataTeacher.id);

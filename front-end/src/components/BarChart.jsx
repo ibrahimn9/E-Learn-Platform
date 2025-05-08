@@ -3,19 +3,27 @@ import { Bar } from "react-chartjs-2";
 import Chart from "chart.js/auto";
 
 import cohort from "../services/cohort";
+import _class from "../services/class";
 
 const BarChart = ({ users }) => {
   const [cohorts, setCohorts] = useState([]);
+  const [classes, setClasses] = useState([]);
 
   const fetchCohorts = async () => {
     const res = await cohort.getAll();
     setCohorts(res.data.data);
   };
 
+  const fetchClasses = async () => {
+    const res = await _class.getAll();
+    setClasses(res.data.data);
+  };
+
   useEffect(() => {
     fetchCohorts();
+    fetchClasses();
   }, []);
-
+  const classLevels = [...new Set(classes.map((cls) => cls.name))];
   const filterActiveStudentsByCohort = (cohortName) =>
     users
       ?.filter((user) => user.role === "student")
@@ -38,12 +46,13 @@ const BarChart = ({ users }) => {
   const activeData = {
     label: "Active Accounts",
     data: [
-      filterActiveStudentsByCohort("1CPI").length,
-      filterActiveStudentsByCohort("2CPI").length,
-      filterActiveStudentsByCohort("1CS").length,
-      filterActiveStudentsByCohort("2CS").length,
-      filterActiveStudentsByCohort("3CS").length,
-      users?.filter((user) => user.role === "teacher").length,
+      filterActiveStudentsByCohort(classLevels[0]).length,
+      filterActiveStudentsByCohort(classLevels[1]).length,
+      filterActiveStudentsByCohort(classLevels[2]).length,
+      filterActiveStudentsByCohort(classLevels[3]).length,
+      filterActiveStudentsByCohort(classLevels[4]).length,
+      users?.filter((user) => user.role === "teacher" && user.isVerified === 1)
+        .length,
     ],
     backgroundColor: "#2E86FB",
     hoverBackgroundColor: "#4F46E5",
@@ -56,12 +65,14 @@ const BarChart = ({ users }) => {
   const inactiveData = {
     label: "Inactive Accounts",
     data: [
-      filterInactiveStudentsByCohort("1CPI").length,
-      filterInactiveStudentsByCohort("2CPI").length,
-      filterInactiveStudentsByCohort("1CS").length,
-      filterInactiveStudentsByCohort("2CS").length,
-      filterInactiveStudentsByCohort("3CS").length,
-      0, // No inactive teachers
+      filterInactiveStudentsByCohort(classLevels[0]).length,
+      filterInactiveStudentsByCohort(classLevels[1]).length,
+      filterInactiveStudentsByCohort(classLevels[2]).length,
+      filterInactiveStudentsByCohort(classLevels[3]).length,
+      filterInactiveStudentsByCohort(classLevels[4]).length,
+      users?.filter((user) => user.role === "teacher" && user.isVerified === 0)
+        .length, // No inactive teachers
+      ,
     ],
     backgroundColor: "#FFD700",
     hoverBackgroundColor: "#FFA500",
@@ -72,7 +83,7 @@ const BarChart = ({ users }) => {
 
   // Chart data
   const data = {
-    labels: ["1CPI", "2CPI", "1CS", "2CS", "3CS", "Teachers"],
+    labels: [...classLevels, "Teachers"],
     datasets: [activeData, inactiveData],
   };
 

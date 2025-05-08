@@ -5,18 +5,13 @@ const multer = require("multer");
 const File = require("../model/file.model.js");
 const { v4: uuidv4 } = require("uuid");
 const { uploadFile } = require("../utils/documentCloud.js");
+const path = require("path");
 const createAssignment = asyncHandler(async (req, res, next) => {
-  // save into assignment table
   const { moduleId, name, timeEnd, description } = req.body;
-
   const fileType = "assignment";
-
-  // save the files
   const file = req.file;
-  const link = await uploadFile(file);
-  const uploadedLink = link.id
 
-
+  const uploadedLink = `/uploads/${file.filename}`;
 
   const assignment = new Assignment(
     name,
@@ -37,6 +32,7 @@ const createAssignment = asyncHandler(async (req, res, next) => {
     fileType
   );
   await newFile.save();
+
   res.status(201).json({ msg: `Assignment Created Successfully` });
 });
 
@@ -94,16 +90,16 @@ const getAssignmentFile = asyncHandler(async (req, res, next) => {
   try {
     const fileId = req.params.fileId;
     const [file] = await File.findById(fileId);
-    const data = await downloadFile(file[0].fileUrl);
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${data.result.name}"`
-    );
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.end(Buffer.from(data.result.fileBinary), "binary");
+
+    if (!file || !file[0]) {
+      return next(new ApiError("File not found", 404));
+    }
+
+    const filePath = path.join(__dirname, "..", "public", file[0].fileUrl);
+    res.sendFile(filePath);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error fetching file from Dropbox");
+    res.status(500).send("Error retrieving file");
   }
 });
 module.exports = {

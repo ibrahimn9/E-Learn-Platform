@@ -33,7 +33,7 @@ const getModulesByCohorteId = asyncHandler(async(req,res,next)=>{
 const getModulesByStudentId = async(req,res,next)=>{
     const {studentId} = req.params;
     const [modules] = await Module.getModulesByStudentId(studentId);
-    console.log(studentId)
+    console.log(modules)
     if(!modules){
         return res.status(404).json({message:"modules not found"});
     }

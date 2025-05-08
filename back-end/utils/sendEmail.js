@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer")
+require('dotenv').config();
 
 const sendEmail = async (options) => {
 	// 1) create a transporter (the service that will send email like : "Gmail","mailGun","mailTrap","Send Grid")

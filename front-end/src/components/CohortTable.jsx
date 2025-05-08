@@ -7,6 +7,7 @@ import { FaChevronRight } from "react-icons/fa";
 import { FaChevronUp } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import cohort from "../services/cohort";
+import _class from "../services/class";
 import { useStateContext } from "../context/StateContext";
 import useClickOutside from "../hooks/useClickOutside";
 
@@ -15,10 +16,14 @@ const CohortTable = ({ allTeachers }) => {
 
   // fetch cohorts
   const [cohorts, setCohorts] = useState([]);
+  const [classes, setClasses] = useState([]);
 
   const fetchData = async () => {
     const res = await cohort.getAll();
     setCohorts(res.data.data);
+    const res1 = await _class.getAll();
+    const classLevels = [...new Set(res1.data.data.map((cls) => cls.name))];
+    setClasses(classLevels);
   };
 
   // //filter functionnalities
@@ -175,7 +180,7 @@ const CohortTable = ({ allTeachers }) => {
     );
   });
 
-  const [teachersToggle, setTeachersToggle] = useState(false)
+  const [teachersToggle, setTeachersToggle] = useState(false);
 
   const teachersRef = useRef();
   useClickOutside(teachersRef, () => {
@@ -208,11 +213,9 @@ const CohortTable = ({ allTeachers }) => {
             className="h-[35px] w-[160px] px-4 py-1 border-[#D5D5D5] font-medium outline-none cursor-pointer"
           >
             <option value="">Class name</option>
-            <option value="1CPI">1CPI</option>
-            <option value="2CPI">2CPI</option>
-            <option value="1CS">1CS</option>
-            <option value="2CS">2CS</option>
-            <option value="3CS">3CS</option>
+            {classes?.map((cl, index) => (
+              <option value={cl} key={index}>{cl}</option>
+            ))}
           </select>
 
           {/* Module filter */}
@@ -435,15 +438,15 @@ const CohortTable = ({ allTeachers }) => {
                               ? setEdittedCohort({
                                   ...edittedCohort,
                                   teachers: edittedCohort.teachers.filter(
-                                    teacherId => teacherId !== teacher.id
+                                    (teacherId) => teacherId !== teacher.id
                                   ),
                                 })
                               : setEdittedCohort({
-                                ...edittedCohort,
-                                teachers: edittedCohort.teachers.concat(
-                                  teacher.id
-                                ),
-                              })
+                                  ...edittedCohort,
+                                  teachers: edittedCohort.teachers.concat(
+                                    teacher.id
+                                  ),
+                                });
                           }}
                           className="flex items-center gap-2 px-4 py-2 text-sm text-[#242B2E] border-gray-300 cursor-pointer hover:bg-gray5"
                         >

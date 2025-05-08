@@ -11,6 +11,7 @@ const ApiError = require("../utils/ApiError.js");
 const createToken = require("../utils/createToken.js");
 const sendEmail = require("../utils/sendEmail.js");
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
 const { allowedNodeEnvironmentFlags } = require("process");
 
@@ -85,7 +86,7 @@ const signInController = asyncHandler(async (req, res, next) => {
 			let emailTemplate;
 			ejs
 				.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
-					user_fullName: capitalizeUserName(userData.fullName),
+					user_fullName: userData.fullName,
 					confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
 					logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
 				})
@@ -304,7 +305,7 @@ const forgotPasswordController = asyncHandler(async (req, res, next) => {
 		let emailTemplate;
 		ejs
 			.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
-				user_fullName: capitalizeUserName(userData.fullName),
+				user_fullName: userData.fullName,
 				confirm_link: resetLink,
 				logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
 			})
@@ -432,7 +433,7 @@ const resendEmail = asyncHandler(async (req, res, next) => {
 	let emailTemplate;
 	ejs
 		.renderFile(path.join(__dirname, "../views/emailTemplate.ejs"), {
-			user_fullName: capitalizeUserName(userData.fullName),
+			user_fullName: userData.fullName,
 			confirm_link: `${process.env.CLIENT_DOMAIN}/api/v1/auth/${userData.id}/verify/${verificationToken.token}`,
 			logoImage: "/img/photo_2024-03-08_18-31-04.jpg",
 		})

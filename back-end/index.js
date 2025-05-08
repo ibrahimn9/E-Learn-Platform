@@ -24,8 +24,10 @@ const submissionRoute = require("./route/submissionRoute.js");
 const assignmentRoute = require("./route/assignmentRoute.js");
 const ApiError = require("./utils/ApiError.js");
 const cors = require("cors");
+require('dotenv').config();
 const PORT = process.env.PORT;
 const app = express();
+
 
 
 // Serve static files from the public directory

@@ -14,9 +14,18 @@ const Home = () => {
 
   const [users, setUsers] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const fetchUsers = async () => {
-    const res = await user.getAll();
-    setUsers(res.data);
+    setIsLoading(true);
+    try {
+      const res = await user.getAll();
+      setUsers(res.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

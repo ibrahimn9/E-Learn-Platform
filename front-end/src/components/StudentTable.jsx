@@ -188,7 +188,13 @@ const StudentTable = ({ students }) => {
       filters.cohorts.length === 0 ||
       filters.cohorts.some((cohort) => cohort.id === student.idCohorte);
 
-    return matchSearch && matchClass && matchCohort;
+    const matchActive =
+      filters.status === "" ||
+      (filters.status === "active" && student.isVerified === 1) ||
+      (filters.status === "inactive" && student.isVerified === 0);
+
+
+    return matchSearch && matchClass && matchCohort && matchActive;
   });
 
   //listing
@@ -213,6 +219,7 @@ const StudentTable = ({ students }) => {
   useEffect(() => {
     fetchCohort();
   }, [filters._class]);
+
 
   return (
     <div className="">
@@ -433,7 +440,9 @@ const StudentTable = ({ students }) => {
               <tr key={index}>
                 <td className="p-4">{student.fullname}</td>
                 <td className="p-4">{student.email}</td>
-                <td className="p-4">Active</td>
+                <td className="p-4">
+                  {student.isVerified === 1 ? "Active" : "Inactive"}
+                </td>
                 <td className="p-4">
                   {
                     cohorts.find((cohort) => cohort.id === student.idCohorte)

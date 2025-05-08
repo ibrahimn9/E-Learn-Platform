@@ -1,6 +1,7 @@
 const {google} = require('googleapis');
 const fs = require('fs');
 const credentials = require("../credentials.json");
+require('dotenv').config();
 
 const SCOPE =["https://www.googleapis.com/auth/drive"];
 

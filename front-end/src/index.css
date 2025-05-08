@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
   font-family: "Barlow", sans-serif;
   font-style: normal;

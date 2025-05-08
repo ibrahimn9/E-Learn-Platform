@@ -12,6 +12,7 @@ import useClickOutside from "../hooks/useClickOutside";
 
 import admin from "../services/admin";
 import module from "../services/module";
+import users from "../services/users";
 
 const TeacherTable = ({ teachers }) => {
   const { refetchTeachers, setRefetchTeachers } = useStateContext();
@@ -28,6 +29,15 @@ const TeacherTable = ({ teachers }) => {
   useEffect(() => {
     fetchModules();
   }, []);
+
+  //fetch editors
+
+  const [editors, setEditors] = useState([]);
+
+  const fetchEditors = async () => {
+    const res = await users.getAll("editor");
+    setEditors(res);
+  };
 
   //filter
 
@@ -46,7 +56,7 @@ const TeacherTable = ({ teachers }) => {
   useClickOutside(moduleRef, () => {
     setModuleToggle(false);
   });
-  
+
   const typeRef = useRef();
   useClickOutside(typeRef, () => {
     setTypeToggle(false);
@@ -101,7 +111,15 @@ const TeacherTable = ({ teachers }) => {
         const filter = filters.is_editor === "editor";
         return !filters.is_editor || isTeacherEditor(teacher) === filter;
       };
-      return matchModules() && matchEditor();
+
+      const matchActive = () => {
+        return (
+          filters.status === "" ||
+          (filters.status === "active" && teacher.isVerified === 1) ||
+          (filters.status === "active" && teacher.isVerified === 0)
+        );
+      };
+      return matchModules() && matchEditor() && matchActive();
     };
 
     return matchSearch && matchFilters();
@@ -389,7 +407,7 @@ const TeacherTable = ({ teachers }) => {
           <IoSearchOutline className="text-[#979797] text-xl" />
           <input
             type="text"
-            placeholder="Search student name"
+            placeholder="Search teacher name"
             value={searchQuery}
             onChange={handleSearchChange}
             className="outline-none"
@@ -416,7 +434,9 @@ const TeacherTable = ({ teachers }) => {
               <tr key={index}>
                 <td className="p-4">{teacher.fullName}</td>
                 <td className="p-4">{teacher.email}</td>
-                <td className="p-4">Active</td>
+                <td className="p-4">
+                  {teacher.isVerified === 1 ? "Active" : "Inactive"}
+                </td>
                 <td className="p-4">
                   {teacher.modules.length
                     ? teacher.modules.map((module, index) => (

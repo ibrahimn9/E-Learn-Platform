@@ -58,8 +58,6 @@ const AssignmentDetail = ({ assignments }) => {
     setUserAssign(res.data.data);
   };
 
-
-
   useEffect(() => {
     fetchSass();
   }, [refetchAssign]);
@@ -102,10 +100,10 @@ const AssignmentDetail = ({ assignments }) => {
               {userAssign?.some((sr) => sr.assignmentId == assignment.id) ? (
                 <a
                   className="basis-[100%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState text-white rounded-md font-medium hover:opacity-[0.8]"
-                  href={
+                  href={`http://localhost:3000${
                     userAssign?.find((sr) => sr.assignmentId == assignment.id)
                       ?.submitLink
-                  }
+                  }`}
                   target="_blank"
                 >
                   Consult
@@ -140,7 +138,7 @@ const AssignmentDetail = ({ assignments }) => {
             </p>
             <div className="mb-4">
               <a
-                href={selectedAssignment.uploadedLink}
+                href={`http://localhost:3000${selectedAssignment.uploadedLink}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline cursor-pointer"

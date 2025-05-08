@@ -4,13 +4,13 @@ const AssignmentResult = require("../model/assignmentResult.model");
 const Submission = require("../model/submission.model");
 const evaluateSubmission = asyncHandler(async (req, res, next) => {
   const { status, studentId } = req.body;
-
   // Check if an evaluation already exists for the given student and assignment
   const [[submission]] = await Submission.findByStudentIdAndAssignmentId(
     req.params.assignmentId,
     studentId
-  );
-
+    );
+    
+    
   if (!submission) {
     return next(new ApiError(`There is no submission for that`, 404));
   }
@@ -22,7 +22,9 @@ const evaluateSubmission = asyncHandler(async (req, res, next) => {
       studentId
     );
 
-  if (existingEvaluation) {
+    
+
+  if (existingEvaluation.length) {
     // Update the status of the existing evaluation
     await AssignmentResult.updateStatus(
       req.params.assignmentId,

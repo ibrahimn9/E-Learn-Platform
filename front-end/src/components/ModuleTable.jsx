@@ -275,6 +275,11 @@ const ModuleTable = ({ allTeachers, classes }) => {
     }
   };
 
+  const uniqueItems = (array) =>
+    Array.from(new Set(array.map((item) => item.id))).map((id) =>
+      array.find((item) => item.id === id)
+    );
+
   return (
     <div className="">
       {errorToggle && (
@@ -444,7 +449,7 @@ const ModuleTable = ({ allTeachers, classes }) => {
                   </div>
                 </div>
                 <div className="max-h-[200px] min-h-[180px] overflow-y-auto pt-1">
-                  {filtredEditors.map((editor, index) => (
+                  {uniqueItems(filtredEditors).map((editor, index) => (
                     <div
                       key={index}
                       onClick={() => {

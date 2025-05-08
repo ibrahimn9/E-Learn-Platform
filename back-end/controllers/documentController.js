@@ -4,6 +4,7 @@ const Document = require("../model/document.model.js");
 const { uploadFile } = require("../utils/documentCloud.js");
 const fs = require("fs");
 const db = require("../config/database");
+const path = require("path"); 
 /**-----------------------------------------------
  * @desc    insert new document
  * @route   /api/v1/teacher/document/insert-new-document/:chapterId
@@ -15,23 +16,40 @@ const addNewDocument = asyncHandler(async (req, res, next) => {
   const file = req.file;
   const { chapterId } = req.params;
   const { title, description, type } = req.body;
-  const response = await uploadFile(file);
+
+  // Ensure file is provided
+  if (!file) {
+    return next(new ApiError("No file provided", 400));
+  }
+
+  // Generate a new file name to avoid name conflicts
+  const fileName = `${Date.now()}-${file.originalname}`;
+  
+  // Define the file path where the file will be saved
+  const filePath = path.join(__dirname, "../public/uploads", fileName);
+
+  // Move the file from temporary location to uploads folder
+  fs.renameSync(file.path, filePath);
+
+  // Save the document with the local file path
   const document = new Document(
     title,
     description,
     type,
-    response.id,
+    `/uploads/${fileName}`,  // Save relative file path in database
     chapterId
   );
+
   try {
     await document.save();
-    await fs.unlinkSync(file.path);
+    return res.status(201).json({ message: "Document inserted successfully" });
   } catch (error) {
-    return error;
+    // Cleanup if error occurs
+    fs.unlinkSync(filePath);
+    return next(new ApiError("Failed to insert document", 500));
   }
-
-  return res.status(201).json({ message: "document inserted succefully" });
 });
+
 
 const deleteDocument = asyncHandler(async (req, res, next) => {
   const { documentId } = req.params;

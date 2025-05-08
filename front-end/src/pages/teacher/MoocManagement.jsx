@@ -165,7 +165,7 @@ const MoocManagement = () => {
                     </p>
                     <div className="flex justify-between items-center">
                       <a
-                        href={mooc.link}
+                        href={`http://localhost:3000${mooc.link}`}
                         target="_blank"
                         className="basis-[45%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState  text-white rounded-md font-medium hover:opacity-[0.8]"
                       >

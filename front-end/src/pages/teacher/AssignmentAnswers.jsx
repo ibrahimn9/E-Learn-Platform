@@ -80,7 +80,7 @@ const AssignmentAnswers = () => {
                     <td className="p-4">{st.groupeNumber}</td>
                     <td className="p-4">
                       <a
-                        href={st.submitLink}
+                        href={`http://localhost:3000/${st.submitLink}`}
                         target="_blank"
                         rel="noreferrer"
                         className="py-1 px-4 border border-gray rounded-md"

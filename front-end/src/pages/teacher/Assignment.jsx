@@ -114,9 +114,6 @@ const Assignment = () => {
                     <div className="py-2">
                       <div className="">
                         <p className="text-gray text-sm">
-                          {assignment.description}
-                        </p>
-                        <p className="text-gray text-sm">
                           Deadline:
                           {new Date(assignment.timeEnd).toLocaleDateString()}
                         </p>
@@ -124,7 +121,7 @@ const Assignment = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <a
-                        href={assignment.uploadedLink}
+                        href={`http://localhost:3000${assignment.uploadedLink}`}
                         target="_blank"
                         className="basis-[45%] flex justify-center items-center text-sm py-2 border bg-blueState border-blueState  text-white rounded-md font-medium hover:opacity-[0.8]"
                       >

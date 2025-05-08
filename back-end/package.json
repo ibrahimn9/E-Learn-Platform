@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"start": "nodemon --env-file=.env index.js",
+		"start": "nodemon index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
@@ -16,6 +16,7 @@
 		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.5",
 		"csv-parser": "^3.0.0",
+		"dotenv": "^16.5.0",
 		"ejs": "^3.1.9",
 		"express": "^4.18.3",
 		"express-async-handler": "^1.2.0",

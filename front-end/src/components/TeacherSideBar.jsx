@@ -14,10 +14,16 @@ import { useStateContext } from "../context/StateContext";
 import { IoClose } from "react-icons/io5";
 
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const TeacherSideBar = () => {
   const { selectedItem, setSelectedItem } = useStateContext();
   const { userData } = useStateContext();
+
+  const logOut = () => {
+    Cookies.set("access_token", "");
+    navigate(`/auth`);
+  };
 
   const sideBarItems = [
     {
@@ -78,7 +84,10 @@ const TeacherSideBar = () => {
           </div>
         ))}
       </div>
-      <div className="py-2 mt-[30vh] flex items-center justify-center rounded-md gap-3 text-md cursor-pointer font-medium text-gray4">
+      <div
+        onClick={() => logOut()}
+        className="py-2 mt-[10vh] flex items-center justify-center rounded-md gap-3 text-md cursor-pointer font-medium text-gray4"
+      >
         <div>
           <IoLogOut />
         </div>

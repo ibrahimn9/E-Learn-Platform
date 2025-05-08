@@ -3,6 +3,7 @@ const ApiError = require("../utils/ApiError");
 const cohort = require("../model/cohort.model");
 const Teacher = require("../model/teacher.model");
 const Student = require("../model/student.model");
+const Admin = require("../model/admin.model")
 const { response } = require("express");
 
 /**-----------------------------------------------
@@ -26,7 +27,7 @@ const getUserAll = asyncHandler(async (req, res, next) => {
       const modules = await Teacher.getTeacherWithModules(user.id);
       user.modules = modules;
     }
-  } else if (role === "editor") {
+  }else if (role === "editor") {
     const [data] = await Teacher.getEditors();
     if (!data) {
       return next(new ApiError("there is no editors", 400));

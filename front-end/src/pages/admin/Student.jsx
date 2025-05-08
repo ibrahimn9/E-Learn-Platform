@@ -1,21 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AdminNav, StudentTable } from "../../components";
+import { FaChevronUp } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import images from "../../constants/images";
 import { useStateContext } from "../../context/StateContext";
 import users from "../../services/users";
 import admin from "../../services/admin";
+import _class from "../../services/class";
+import useClickOutside from "../../hooks/useClickOutside";
 
 const Student = () => {
   const { refetchStudents, setRefetchStudents } = useStateContext();
 
   //fetch students
   const [students, setStudents] = useState([]);
+  const [classes, setClasses] = useState([]);
 
   const fetchData = async () => {
     const res = await users.getAll("student");
     setStudents(res.data);
+    const res1 = await _class.getAll();
+    setClasses(res1.data.data);
   };
+
+  
 
   useEffect(() => {
     fetchData();
@@ -62,6 +71,14 @@ const Student = () => {
       }
     }
   };
+
+
+
+  const [classToggle, setClassToggle] = useState(false);
+  const classRef = useRef();
+  useClickOutside(classRef, () => {
+    setClassToggle(false);
+  });
 
   // send csv file
   const [file, setFile] = useState(null);
@@ -221,21 +238,53 @@ const Student = () => {
                   className="w-full px-4 py-2 border rounded-md bg-[#F5F6FA] border-primary focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="idclass"
+              <div className="relative" ref={classRef}>
+              <label
+                  htmlFor="name"
                   className="text-[#606060] font-medium block mb-1"
                 >
-                  Enter the Class ID
+                  Enter the class
                 </label>
-                <input
-                  type="text"
-                  id="class"
-                  value={idClass}
-                  onChange={(e) => setIdClass(e.target.value)}
-                  placeholder="Enter class ID"
-                  className="w-full px-4 py-2 border border-primary focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 rounded-md bg-[#F5F6FA]"
-                />
+                <button
+                  onClick={() => setClassToggle(!classToggle)}
+                  className="w-full px-4 py-2  border flex justify-between items-center mb-8 text-gray border-primary focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 rounded-md bg-[#F5F6FA]"
+                >
+                  Class
+                  {!classToggle ? (
+                    <FaChevronDown className="text-gray-400 text-sm mt-[2px]" />
+                  ) : (
+                    <FaChevronUp className="text-gray-400 text-sm mt-[2px]" />
+                  )}
+                </button>
+                {classToggle && (
+                  <div
+                    className="absolute w-[100%] bg-white rounded-lg z-[150] top-[115%] left-0 overflow-y-auto"
+                    style={{ boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)" }}
+                  >
+                    <div className="max-h-[160px] min-h-[160px] overflow-y-auto pt-1">
+                      {classes
+                        .sort((a, b) => a.id - b.id)
+                        ?.map((_class, index) => (
+                          <div
+                            key={index}
+                            onClick={() => setIdClass(_class.id)}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-[#242B2E] border-gray-300 cursor-pointer hover:bg-gray5"
+                          >
+                            {idClass === _class.id ? (
+                              <img src={images.check} alt="check" />
+                            ) : (
+                              <img src={images.notcheck} alt="notcheck" />
+                            )}
+                            <div>
+                              {_class.speciality === null
+                                ? _class.name
+                                : `${_class.name}/${_class.speciality}`}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="mb-8">
                 <label
